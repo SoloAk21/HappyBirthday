@@ -1,0 +1,167 @@
+{
+  "recipientName": "Star",
+  "senderName": "Your Name",
+  "birthday": {
+    "date": "2026-11-14",
+    "timeZone": "Africa/Addis_Ababa"
+  },
+  "invitation": {
+    "greeting": "Hello, Star.",
+    "line": "A small surprise is waiting.",
+    "button": "Open the Surprise"
+  },
+  "reveal": {
+    "date": "November 14.",
+    "line": "The day someone special arrived.",
+    "title": "Happy Birthday, Star.",
+    "portrait": {
+      "id": "portrait",
+      "alt": "Portrait",
+      "focus": "50% 40%"
+    }
+  },
+  "smile": {
+    "original": "Your original words, in any language.",
+    "lines": ["First line.", "Second line.", "The line that lands."],
+    "photo": {
+      "id": "smile",
+      "alt": "Smiling photo"
+    },
+    "motion": {
+      "id": "smile-loop",
+      "alt": "Smiling clip"
+    }
+  },
+  "gallery": {
+    "kicker": "Chapter IV",
+    "title": "Our Little Moments",
+    "intro": "A few moments.",
+    "items": [
+      {
+        "id": "film",
+        "alt": "A short film",
+        "caption": "Our little film"
+      },
+      {
+        "id": "together",
+        "alt": "A photo of us",
+        "caption": "Us."
+      }
+    ]
+  },
+  "notes": {
+    "kicker": "Chapter V",
+    "title": "Little Things I Adore",
+    "items": [
+      {
+        "label": "Open me",
+        "text": "Placeholder note one."
+      },
+      {
+        "label": "And this",
+        "text": "Placeholder note two."
+      }
+    ]
+  },
+  "letter": {
+    "kicker": "Chapter VI",
+    "title": "A Letter for You",
+    "button": "Read My Letter",
+    "salutation": "My Moon,",
+    "paragraphs": ["Placeholder paragraph — replace with your own words."],
+    "closing": "With all my love,",
+    "signature": "Your Name"
+  },
+  "gift": {
+    "kicker": "Chapter VII",
+    "title": "One More Surprise",
+    "button": "Open Your Gift",
+    "heading": "Placeholder heading.",
+    "text": "Placeholder surprise text.",
+    "media": {
+      "id": "together",
+      "alt": "A photo of us"
+    }
+  },
+  "wish": {
+    "original": "Original wish.",
+    "english": "English wish.",
+    "media": {
+      "id": "film",
+      "alt": "A clip"
+    }
+  },
+  "finale": {
+    "photo": {
+      "id": "together",
+      "alt": "A photo of us"
+    },
+    "title": "Happy Birthday, Star.",
+    "signature": "With all my love, Your Name."
+  },
+  "media": {
+    "portrait": {
+      "id": "portrait",
+      "kind": "image",
+      "variants": [
+        {
+          "file": "portrait-640.webp",
+          "width": 640,
+          "height": 1138
+        }
+      ]
+    },
+    "smile": {
+      "id": "smile",
+      "kind": "image",
+      "variants": [
+        {
+          "file": "smile-640.webp",
+          "width": 640,
+          "height": 1129
+        }
+      ]
+    },
+    "smile-loop": {
+      "id": "smile-loop",
+      "kind": "video",
+      "file": "smile-loop.mp4",
+      "width": 544,
+      "height": 960,
+      "duration": 3.6,
+      "poster": [
+        {
+          "file": "smile-loop-poster-544.webp",
+          "width": 544,
+          "height": 960
+        }
+      ]
+    },
+    "film": {
+      "id": "film",
+      "kind": "video",
+      "file": "film.mp4",
+      "width": 720,
+      "height": 1270,
+      "duration": 40,
+      "poster": [
+        {
+          "file": "film-poster-720.webp",
+          "width": 720,
+          "height": 1270
+        }
+      ]
+    },
+    "together": {
+      "id": "together",
+      "kind": "image",
+      "variants": [
+        {
+          "file": "together-1080.webp",
+          "width": 1080,
+          "height": 1920
+        }
+      ]
+    }
+  }
+}
