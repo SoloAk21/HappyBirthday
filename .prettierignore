@@ -1,0 +1,8 @@
+node_modules
+dist
+.private
+coverage
+playwright-report
+test-results
+package-lock.json
+*.md

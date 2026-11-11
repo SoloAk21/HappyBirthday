@@ -1,0 +1,31 @@
+# Dependencies & builds
+node_modules
+dist
+.vercel
+coverage
+playwright-report
+test-results
+*.tsbuildinfo
+
+# PRIVATE — personal media, content, screenshots, secrets. Never commit.
+.private/
+.env
+.env.*
+!.env.example
+
+# Media is private by default. Only abstract placeholders/brand are allowed.
+*.mp4
+*.mov
+*.webm
+*.webp
+*.jpg
+*.jpeg
+*.png
+*.heic
+!public/brand/**
+!tests/fixtures/site/media/**
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.qodo/
