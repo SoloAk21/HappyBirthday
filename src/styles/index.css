@@ -1,0 +1,191 @@
+@import 'tailwindcss';
+
+/* Fonts are self-hosted via Fontsource (no third-party requests). */
+@import '@fontsource/cormorant-garamond/latin-300.css';
+@import '@fontsource/cormorant-garamond/latin-400.css';
+@import '@fontsource/cormorant-garamond/latin-400-italic.css';
+@import '@fontsource/cormorant-garamond/latin-500-italic.css';
+@import '@fontsource-variable/manrope/wght.css';
+@import '@fontsource/noto-serif-ethiopic/ethiopic-400.css';
+
+@theme {
+  --color-night: #0b0f1f;
+  --color-night-2: #121833;
+  --color-night-3: #1b2244;
+  --color-lavender: #b9b3dc;
+  --color-lavender-dim: #8d88b3;
+  --color-ivory: #f6f0e4;
+  --color-ivory-dim: #d9d2c4;
+  --color-champagne: #d8bf94;
+  --color-champagne-deep: #b39468;
+  --color-paper: #f4ecdc;
+  --color-ink: #2a2440;
+
+  --font-serif: 'Cormorant Garamond', 'Noto Serif Ethiopic', Georgia, serif;
+  --font-sans: 'Manrope Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-ethiopic: 'Noto Serif Ethiopic', 'Cormorant Garamond', serif;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --gutter: clamp(1.25rem, 5vw, 3rem);
+  }
+
+  html {
+    background: var(--color-night);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--color-night);
+    color: var(--color-ivory);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-champagne) 45%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-champagne);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  img,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+  }
+}
+
+@layer components {
+  .display {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+
+  .kicker {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-champagne);
+  }
+
+  .prose-serif {
+    font-family: var(--font-serif);
+    font-size: clamp(1.25rem, 4.6vw, 1.6rem);
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
+  .ethiopic {
+    font-family: var(--font-ethiopic);
+    line-height: 1.9;
+  }
+
+  .chapter {
+    position: relative;
+    padding-inline: var(--gutter);
+    padding-block: clamp(5rem, 16vh, 9rem);
+  }
+
+  /* Primary action: a quiet pill with a champagne hairline. */
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 3.25rem;
+    padding: 0.9rem 1.75rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--color-champagne) 70%, transparent);
+    background: color-mix(in oklab, var(--color-night-2) 70%, transparent);
+    color: var(--color-ivory);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
+      background-color 0.3s,
+      border-color 0.3s;
+    touch-action: manipulation;
+  }
+  .btn:hover {
+    background: color-mix(in oklab, var(--color-champagne) 14%, var(--color-night-2));
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn-ghost {
+    border-color: color-mix(in oklab, var(--color-ivory) 25%, transparent);
+    background: transparent;
+  }
+
+  .frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--color-night-2);
+    box-shadow:
+      0 30px 60px -30px rgb(0 0 0 / 0.7),
+      0 0 0 1px rgb(255 255 255 / 0.04);
+  }
+  .frame > img,
+  .frame > video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hairline {
+    height: 1px;
+    width: 3rem;
+    background: linear-gradient(90deg, transparent, var(--color-champagne), transparent);
+  }
+}
+
+/* Elements that animate in start visible; JS hides them only when it will animate. */
+.no-js-safe {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
