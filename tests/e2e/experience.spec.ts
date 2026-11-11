@@ -107,7 +107,7 @@ test.describe('the experience', () => {
     expect(errors).toEqual([]);
   });
 
-  test('gallery viewer: open, navigate, close; video streams', async ({ page }) => {
+  test('gallery viewer: open, navigate, close; video streams', async ({ page, browserName }) => {
     await unlock(page);
     await page.getByRole('button', { name: /Open the Surprise/ }).click();
     await page.locator('#moments').scrollIntoViewIfNeeded();
@@ -116,9 +116,12 @@ test.describe('the experience', () => {
     await expect(dialog).toBeVisible();
     await expect(dialog.getByText('1 / 2')).toBeVisible();
     const video = dialog.locator('video');
-    await expect
-      .poll(() => video.evaluate((v: HTMLVideoElement) => v.readyState), { timeout: 15000 })
-      .toBeGreaterThanOrEqual(1);
+    // Playwright's Windows WebKit build ships without MP4 decoding (verified with a bare <video>);
+    // Linux CI WebKit and real iOS Safari still cover playback.
+    if (!(browserName === 'webkit' && process.platform === 'win32'))
+      await expect
+        .poll(() => video.evaluate((v: HTMLVideoElement) => v.readyState), { timeout: 15000 })
+        .toBeGreaterThanOrEqual(1);
     await page.getByRole('button', { name: 'Next memory' }).click();
     await expect(dialog.getByText('2 / 2')).toBeVisible();
     await page.keyboard.press('Escape');
