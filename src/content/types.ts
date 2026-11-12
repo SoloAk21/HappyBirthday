@@ -47,21 +47,77 @@ export interface BirthdayConfig {
   timeZone: string;
 }
 
+/** One act of the story sequence: a media frame and the lines told over it. */
+export interface StoryBeat {
+  media: MediaRef;
+  lines: string[];
+}
+
+/**
+ * In-experience interface labels (chapter list, countdown, buttons…). They are
+ * private content because they are written to her; every key is optional and
+ * falls back to the neutral English default in the code.
+ */
+export interface UiText {
+  /** BCP 47 language of the experience, e.g. "am". */
+  lang?: string;
+  documentTitle?: string;
+  chapters?: string[];
+  chaptersTitle?: string;
+  continue?: string;
+  countdownTitle?: string;
+  countdownUnits?: [string, string, string, string];
+  countdownNote?: string;
+  today?: string;
+  swipeHint?: string;
+  watch?: string;
+  notesHint?: string;
+  notesProgress?: string;
+  notesDone?: string;
+  replay?: string;
+  revisit?: string;
+  soundOn?: string;
+  soundOff?: string;
+  pause?: string;
+  play?: string;
+  volume?: string;
+}
+
+export interface MusicTrack {
+  /** Private media file name, e.g. "music.m4a". */
+  file: string;
+  title?: string;
+}
+
 export interface SiteContent {
+  ui?: UiText;
+  music?: MusicTrack;
   recipientName: string;
   senderName: string;
   birthday: BirthdayConfig;
   invitation: { greeting: string; line: string; button: string };
-  reveal: { date: string; line: string; title: string; portrait: MediaRef };
-  smile: { original: string; lines: string[]; photo: MediaRef; motion?: MediaRef };
+  reveal: { kicker?: string; date: string; line: string; title: string; portrait: MediaRef };
+  smile: {
+    kicker?: string;
+    title?: string;
+    /** Optional quote shown above the photo (e.g. the original-language words). */
+    original?: string;
+    lines: string[];
+    photo: MediaRef;
+    motion?: MediaRef;
+  };
+  /** Optional cinematic sequence told before the gallery. */
+  story?: { kicker?: string; title?: string; beats: StoryBeat[] };
   gallery: { kicker: string; title: string; intro?: string; items: GalleryItem[] };
-  notes: { kicker: string; title: string; items: Note[] };
+  notes: { kicker: string; title: string; items: Note[]; quote?: string };
   letter: {
     kicker: string;
     title: string;
     button: string;
     salutation: string;
     paragraphs: string[];
+    /** Optional emphasised paragraph, read last before the closing. */
+    highlight?: string;
     closing: string;
     signature: string;
   };
@@ -73,7 +129,13 @@ export interface SiteContent {
     text: string;
     media?: MediaRef;
   };
-  wish: { original: string; english: string; media: MediaRef };
-  finale: { photo: MediaRef; title: string; signature: string; lines?: string[] };
+  wish: { kicker?: string; original: string; english?: string; media: MediaRef };
+  finale: {
+    kicker?: string;
+    photo: MediaRef;
+    title: string;
+    signature: string;
+    lines?: string[];
+  };
   media: Record<string, MediaAsset>;
 }

@@ -1,7 +1,7 @@
 // Lightweight validation of the private content bundle (shared by the
 // build script and unit tests). Returns a list of human-readable problems.
 
-const MEDIA_FILE = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.mp4|-\d{2,4}\.webp)$/;
+const MEDIA_FILE = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.mp4|\.m4a|-\d{2,4}\.webp)$/;
 
 export function validateContent(c) {
   const errs = [];
@@ -27,7 +27,6 @@ export function validateContent(c) {
   for (const k of ['greeting', 'line', 'button']) str(c.invitation?.[k], `invitation.${k}`);
   for (const k of ['date', 'line', 'title']) str(c.reveal?.[k], `reveal.${k}`);
   ref(c.reveal?.portrait, 'reveal.portrait');
-  str(c.smile?.original, 'smile.original');
   if (!Array.isArray(c.smile?.lines) || !c.smile.lines.length)
     errs.push('smile.lines needs at least one line');
   ref(c.smile?.photo, 'smile.photo');
@@ -48,8 +47,15 @@ export function validateContent(c) {
   for (const k of ['button', 'heading', 'text']) str(c.gift?.[k], `gift.${k}`);
   if (c.gift?.media) ref(c.gift.media, 'gift.media');
   str(c.wish?.original, 'wish.original');
-  str(c.wish?.english, 'wish.english');
   ref(c.wish?.media, 'wish.media');
+  c.story?.beats?.forEach((b, i) => {
+    ref(b.media, `story.beats[${i}].media`);
+    if (!Array.isArray(b.lines) || !b.lines.length) errs.push(`story.beats[${i}].lines is empty`);
+  });
+  if (c.music && !/^[a-z0-9]+(?:-[a-z0-9]+)*\.m4a$/.test(c.music.file ?? ''))
+    errs.push('music.file must be a safe .m4a file name');
+  if (c.ui?.chapters && (!Array.isArray(c.ui.chapters) || c.ui.chapters.length !== 9))
+    errs.push('ui.chapters must list all 9 chapter labels');
   ref(c.finale?.photo, 'finale.photo');
   str(c.finale?.title, 'finale.title');
   str(c.finale?.signature, 'finale.signature');

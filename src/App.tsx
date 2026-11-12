@@ -14,7 +14,9 @@ import { ContentContext } from './components/ContentContext';
 import { MuteToggle } from './components/MuteToggle';
 import { Starfield } from './components/Starfield';
 import type { SiteContent } from './content/types';
-import { loadContent, sessionStatus } from './lib/api';
+import { resolveUi } from './content/ui';
+import { PUBLIC_TEXT as T } from './i18n/public';
+import { loadContent } from './lib/api';
 import { ScrollTrigger } from './lib/motion';
 import { sound } from './lib/sound';
 
@@ -35,7 +37,10 @@ export default function App() {
       const c = await loadContent();
       if (!c) return setStatus('locked');
       setContent(c);
-      document.title = 'For My Moon';
+      if (c.music) sound.setTrack(c.music.file);
+      const ui = resolveUi(c.ui);
+      document.title = ui.documentTitle;
+      document.documentElement.lang = ui.lang;
       setStatus('ready');
     } catch {
       setStatus('error');
@@ -43,24 +48,29 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    void sessionStatus().then((ok) => (ok ? load() : setStatus('locked')));
+    // One request decides it: 200 → the experience, 401 → the unlock screen.
+    void load();
   }, [load]);
 
   return (
     <>
       <Starfield />
       {status === 'checking' || status === 'loading' ? (
-        <div className="grid min-h-[100dvh] place-items-center" role="status" aria-label="Opening">
+        <div
+          className="grid min-h-[100dvh] place-items-center"
+          role="status"
+          aria-label={T.loading}
+        >
           <span className="h-2 w-2 animate-pulse rounded-full bg-ivory/70" />
         </div>
       ) : status === 'locked' ? (
         <Unlock onUnlocked={load} />
       ) : status === 'error' || !content ? (
-        <div className="grid min-h-[100dvh] place-items-center px-6 text-center">
+        <div className="grid min-h-[100dvh] place-items-center px-6 text-center" lang={T.lang}>
           <div>
-            <p className="display text-3xl">The stars are a little shy right now.</p>
+            <p className="display text-3xl">{T.error}</p>
             <button type="button" className="btn mt-8" onClick={load}>
-              Try again
+              {T.retry}
             </button>
           </div>
         </div>

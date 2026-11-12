@@ -6,7 +6,11 @@
 @import '@fontsource/cormorant-garamond/latin-400-italic.css';
 @import '@fontsource/cormorant-garamond/latin-500-italic.css';
 @import '@fontsource-variable/manrope/wght.css';
+/* Ethiopic: loaded only when Ethiopic text is on screen (unicode-range). */
+@import '@fontsource/noto-serif-ethiopic/ethiopic-300.css';
 @import '@fontsource/noto-serif-ethiopic/ethiopic-400.css';
+@import '@fontsource/noto-sans-ethiopic/ethiopic-400.css';
+@import '@fontsource/noto-sans-ethiopic/ethiopic-600.css';
 
 @theme {
   --color-night: #0b0f1f;
@@ -22,7 +26,8 @@
   --color-ink: #2a2440;
 
   --font-serif: 'Cormorant Garamond', 'Noto Serif Ethiopic', Georgia, serif;
-  --font-sans: 'Manrope Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans:
+    'Manrope Variable', 'Noto Sans Ethiopic', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-ethiopic: 'Noto Serif Ethiopic', 'Cormorant Garamond', serif;
 }
 
@@ -187,5 +192,39 @@
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+/* ── Amharic (Ethiopic) typography ─────────────────────────────────────────
+   Ethiopic has no italic and taller syllables than Latin: never fake a slant,
+   give lines more room, and keep letter-spacing modest. */
+@layer components {
+  :lang(am) {
+    font-synthesis: none;
+    overflow-wrap: break-word;
+  }
+  :lang(am) .display {
+    line-height: 1.24;
+    letter-spacing: 0;
+  }
+  :lang(am) .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+  }
+  :lang(am) .prose-serif {
+    font-size: clamp(1.12rem, 4.3vw, 1.45rem);
+    line-height: 1.75;
+  }
+  :lang(am) .btn {
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+  }
+  :lang(am) .ethiopic {
+    line-height: 1.85;
+  }
+  /* word-reveal masks: room for the tallest syllables and their vowel marks */
+  :lang(am) .word-clip {
+    padding-top: 0.08em;
+    margin-top: -0.08em;
   }
 }

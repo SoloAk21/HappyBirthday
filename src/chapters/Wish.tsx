@@ -75,7 +75,7 @@ export function Wish() {
       </svg>
 
       <p className="kicker" data-wish>
-        Chapter VIII
+        {c.wish.kicker ?? 'Chapter VIII'}
       </p>
       <h2
         id="wish-title"
@@ -85,10 +85,14 @@ export function Wish() {
       >
         {c.wish.original}
       </h2>
-      <div data-wish className="hairline my-8" />
-      <p data-wish className="prose-serif max-w-md italic text-ivory/85">
-        {c.wish.english}
-      </p>
+      {c.wish.english && (
+        <>
+          <div data-wish className="hairline my-8" />
+          <p data-wish className="prose-serif max-w-md italic text-ivory/85">
+            {c.wish.english}
+          </p>
+        </>
+      )}
     </section>
   );
 }

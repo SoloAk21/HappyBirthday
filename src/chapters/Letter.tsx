@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useContent } from '../components/ContentContext';
 import { useReveal } from '../hooks/useReveal';
 import { DUR, EASE, STAGGER, gsap, prefersReducedMotion } from '../lib/motion';
@@ -37,6 +37,20 @@ export function Letter() {
       )
       .to(env, { autoAlpha: 0, y: 30, duration: DUR.base, ease: EASE.inOut }, '+=0.15');
   }
+
+  // While she reads, the music steps back a little.
+  useEffect(() => {
+    const el = paper.current;
+    if (state !== 'open' || !el) return;
+    const io = new IntersectionObserver(([e]) => sound.duck(!!e?.isIntersecting), {
+      threshold: 0.25,
+    });
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      sound.duck(false);
+    };
+  }, [state]);
 
   // Paper entrance once it exists in the DOM.
   useLayoutEffect(() => {
@@ -149,6 +163,14 @@ export function Letter() {
               </p>
             ))}
           </div>
+          {l.highlight && (
+            <p
+              data-para
+              className="mt-8 border-l-2 border-[#8e3b4a]/50 pl-5 font-serif text-[1.3rem] leading-[1.75] text-[#5b2232] sm:text-[1.4rem]"
+            >
+              {l.highlight}
+            </p>
+          )}
           <p data-para className="mt-10 font-serif text-xl italic">
             {l.closing}
           </p>

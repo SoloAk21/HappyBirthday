@@ -2,10 +2,12 @@ import { useRef, useState } from 'react';
 import { useContent } from '../components/ContentContext';
 import { useReveal } from '../hooks/useReveal';
 import { sound } from '../lib/sound';
+import { fill, useUi } from '../content/ui';
 
 /** Scene 5 — Little Things I Adore: sealed notes she taps open. */
 export function Notes() {
   const c = useContent();
+  const ui = useUi();
   const scope = useRef<HTMLElement>(null);
   const [opened, setOpened] = useState<Set<number>>(new Set());
   useReveal(scope);
@@ -26,10 +28,10 @@ export function Notes() {
       </h2>
       <p data-reveal className="mt-3 text-sm text-ivory/60" aria-live="polite">
         {opened.size === 0
-          ? 'Tap a note to break its seal.'
+          ? ui.notesHint
           : opened.size < total
-            ? `${opened.size} of ${total} opened`
-            : 'All of them — and still not everything.'}
+            ? fill(ui.notesProgress, { n: opened.size, total })
+            : ui.notesDone}
       </p>
 
       <ul className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
@@ -82,6 +84,16 @@ export function Notes() {
           );
         })}
       </ul>
+
+      {c.notes.quote && (
+        <figure data-reveal className="mx-auto mt-20 max-w-lg text-center">
+          <div className="hairline mx-auto mb-8" aria-hidden="true" />
+          <blockquote className="prose-serif text-[clamp(1.35rem,5.4vw,1.85rem)] text-ivory/90">
+            {c.notes.quote}
+          </blockquote>
+          <div className="hairline mx-auto mt-8" aria-hidden="true" />
+        </figure>
+      )}
     </section>
   );
 }

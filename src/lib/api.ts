@@ -39,11 +39,32 @@ export async function lock(): Promise<void> {
   await fetch('/api/session', { method: 'DELETE', credentials: 'same-origin' }).catch(() => {});
 }
 
+declare global {
+  interface Window {
+    /** Started by /boot.js before the bundle loads; consumed once. */
+    __moonContent?: Promise<Response | null>;
+  }
+}
+
+function takePrefetched(): Promise<Response | null> | undefined {
+  const p = window.__moonContent;
+  window.__moonContent = undefined;
+  return p;
+}
+
+/** Returns the private content, or null when there is no valid session. */
 export async function loadContent(): Promise<SiteContent | null> {
-  const res = await fetch('/api/content', { credentials: 'same-origin', cache: 'no-store' });
+  const res =
+    (await takePrefetched()) ??
+    (await fetch('/api/content', {
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'X-Moon-Probe': '1' },
+    }));
   if (res.status === 401) return null;
   if (!res.ok) throw new Error(`content ${res.status}`);
-  return (await res.json()) as SiteContent;
+  const data = (await res.json()) as SiteContent | { authenticated: false };
+  return 'authenticated' in data ? null : data;
 }
 
 export const mediaUrl = (file: string) => `/api/media/${encodeURIComponent(file)}`;

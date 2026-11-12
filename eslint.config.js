@@ -30,4 +30,8 @@ export default tseslint.config(
     extends: [js.configs.recommended],
     languageOptions: { globals: { ...globals.node } },
   },
+  {
+    files: ['public/**/*.js'],
+    languageOptions: { globals: { ...globals.browser } },
+  },
 );

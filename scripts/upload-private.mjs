@@ -10,7 +10,12 @@ if (!process.env.BLOB_READ_WRITE_TOKEN) {
   console.error('BLOB_READ_WRITE_TOKEN is not set.');
   process.exit(1);
 }
-const types = { mp4: 'video/mp4', webp: 'image/webp', json: 'application/json' };
+const types = {
+  mp4: 'video/mp4',
+  m4a: 'audio/mp4',
+  webp: 'image/webp',
+  json: 'application/json',
+};
 const files = ['content.json', ...(await readdir(join(dir, 'media'))).map((f) => `media/${f}`)];
 for (const f of files) {
   const body = await readFile(join(dir, f));

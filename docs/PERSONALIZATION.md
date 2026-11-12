@@ -6,10 +6,17 @@ No redeploy is needed for content.
 
 ## Names & messages
 Edit `.private/content.source.json`. Every visible sentence is there:
-`invitation`, `reveal`, `smile` (original + English lines; the last line is
-the champagne "landing" line), `gallery` captions, `notes`, `letter`
-(paragraphs array), `gift`, `wish`, `finale`. The build validates it and refuses
-to run on missing fields or broken media references.
+`invitation`, `reveal`, `smile` (lines; the last one is the champagne
+"landing" line), `story` (optional: beats of lines told over a pinned photo or
+video, opening Chapter IV), `gallery` captions, `notes` (+ optional `quote`),
+`letter` (paragraphs, optional `highlight`, closing, signature), `gift`, `wish`,
+`finale`. Optional `kicker` fields replace the "Chapter II…" labels.
+`ui` holds every in-experience label (chapter list, countdown, buttons, sound
+controls) and `ui.lang` (e.g. `"am"`) sets the page language — Ethiopic text
+then gets its own typography (Noto Serif/Sans Ethiopic, no faked italics, more
+line height). The pre-unlock screen is public, so its generic text lives in
+`src/i18n/public.ts` instead. The build validates everything and refuses to run
+on missing fields or broken media references.
 
 ## Birthday date & time zone
 `birthday.date` (`YYYY-MM-DD`) and `birthday.timeZone` (IANA, e.g.
@@ -29,9 +36,14 @@ to run on missing fields or broken media references.
    `focus` (CSS object-position such as `"50% 30%"`) to keep faces in frame.
 
 ## Sound
-`src/lib/sound.ts` — chords (`CHORDS`), sparkle notes, volumes. It is fully
-synthesized; to use a licensed music file instead, upload it privately and play
-it through the same mute toggle.
+`src/lib/sound.ts` — by default an original synthesized score (chords, sparkle
+notes). To use a recording **you have the right to publish**:
+1. `ffmpeg -i song.mp3 -map 0:a:0 -map_metadata -1 -c:a aac -b:a 128k -movflags +faststart .private/media/music.m4a`
+2. add `"music": { "file": "music.m4a" }` to the content, rebuild, upload.
+It streams through the authenticated media route, starts only after her tap,
+fades in/out, and the speaker button becomes a small panel (pause/play, volume,
+mute). Remove the `music` entry and rebuild to withdraw it — the build cleans
+`.private/site/media`, so a withdrawn track is never uploaded again.
 
 ## Pacing & motion
 `src/lib/motion.ts` holds the tokens (durations, easings, staggers). Each

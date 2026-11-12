@@ -136,6 +136,13 @@ describe('API handlers', () => {
   it('denies content and media without a session', async () => {
     const cfg = await config();
     expect((await handleContent(req('/api/content'), cfg)).status).toBe(401);
+    // the app's quiet first-load probe learns only that it is locked
+    const probe = await handleContent(
+      req('/api/content', { headers: { 'x-moon-probe': '1' } }),
+      cfg,
+    );
+    expect(probe.status).toBe(200);
+    expect(await probe.json()).toEqual({ authenticated: false });
     expect((await handleMedia(req('/api/media/clip.mp4'), 'clip.mp4', cfg)).status).toBe(401);
     expect(
       (
@@ -216,6 +223,7 @@ describe('media helpers', () => {
       'smile-loop.mp4',
       'final-1080.webp',
       'smile-loop-poster-544.webp',
+      'music.m4a',
     ])
       expect(MEDIA_NAME.test(ok)).toBe(true);
     for (const bad of [
@@ -226,6 +234,8 @@ describe('media helpers', () => {
       'X.mp4',
       '.mp4',
       'a..b.mp4',
+      'song.mp3',
+      '../music.m4a',
     ])
       expect(MEDIA_NAME.test(bad)).toBe(false);
   });

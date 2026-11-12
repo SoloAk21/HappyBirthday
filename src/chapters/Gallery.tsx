@@ -5,20 +5,26 @@ import { MediaView, useAsset } from '../components/Media';
 import type { GalleryItem } from '../content/types';
 import { useReveal } from '../hooks/useReveal';
 import { sound } from '../lib/sound';
+import { useUi } from '../content/ui';
+import { Story } from './Story';
 
 /** Scene 4 — Our Little Moments: a swipeable exhibition + fullscreen viewer. */
 export function Gallery() {
   const c = useContent();
+  const ui = useUi();
   const scope = useRef<HTMLElement>(null);
   const [open, setOpen] = useState<number | null>(null);
   useReveal(scope);
 
   return (
     <section id="moments" ref={scope} aria-labelledby="moments-title" className="chapter !px-0">
-      <div className="mx-auto max-w-5xl px-[var(--gutter)]">
-        <p className="kicker" data-reveal>
-          {c.gallery.kicker}
-        </p>
+      {c.story && <Story />}
+      <div className={`mx-auto max-w-5xl px-[var(--gutter)]${c.story ? ' mt-8' : ''}`}>
+        {!c.story?.kicker && (
+          <p className="kicker" data-reveal>
+            {c.gallery.kicker}
+          </p>
+        )}
         <h2 id="moments-title" data-reveal className="display mt-4 text-[clamp(2.6rem,11vw,5rem)]">
           {c.gallery.title}
         </h2>
@@ -28,7 +34,7 @@ export function Gallery() {
           </p>
         )}
         <p data-reveal className="mt-3 text-xs uppercase tracking-[0.25em] text-ivory/65">
-          Swipe · tap to open
+          {ui.swipeHint}
         </p>
       </div>
 
@@ -39,7 +45,12 @@ export function Gallery() {
       >
         {c.gallery.items.map((item, i) => (
           <li key={item.id} className="shrink-0 snap-center first:snap-start" data-reveal>
-            <Card item={item} featured={i === 0} onOpen={() => (sound.chime(), setOpen(i))} />
+            <Card
+              item={item}
+              featured={i === 0}
+              watch={ui.watch}
+              onOpen={() => (sound.chime(), setOpen(i))}
+            />
           </li>
         ))}
         <li aria-hidden="true" className="w-1 shrink-0" />
@@ -53,10 +64,12 @@ export function Gallery() {
 function Card({
   item,
   featured,
+  watch,
   onOpen,
 }: {
   item: GalleryItem;
   featured: boolean;
+  watch: string;
   onOpen: () => void;
 }) {
   const asset = useAsset(item);
@@ -67,7 +80,7 @@ function Card({
         type="button"
         onClick={onOpen}
         className="frame group block aspect-[9/16] w-full cursor-zoom-in"
-        aria-label={`${isVideo ? 'Watch' : 'Open'}: ${item.caption ?? item.alt}`}
+        aria-label={`${isVideo ? watch : 'Open'}: ${item.caption ?? item.alt}`}
       >
         <MediaView
           media={item}
@@ -79,7 +92,7 @@ function Card({
             aria-hidden="true"
             className="absolute bottom-4 left-4 flex items-center gap-2 rounded-full bg-night/60 px-3 py-1.5 text-[0.7rem] uppercase tracking-[0.2em] backdrop-blur"
           >
-            ▶ Watch
+            ▶ {watch}
           </span>
         )}
       </button>

@@ -1,15 +1,17 @@
 import { useEffect, useRef } from 'react';
+import { useUi } from '../content/ui';
 
+/** Chapter anchors, in order. Their labels come from the content (ui.chapters). */
 export const CHAPTERS = [
-  { id: 'invitation', label: 'Hey, My Moon' },
-  { id: 'birthday', label: 'A birthday worth celebrating' },
-  { id: 'smile', label: 'The smile that changes everything' },
-  { id: 'moments', label: 'Our little moments' },
-  { id: 'adore', label: 'Little things I adore' },
-  { id: 'letter', label: 'A letter for my Moon' },
-  { id: 'surprise', label: 'One more surprise' },
-  { id: 'wish', label: 'My birthday wish' },
-  { id: 'finale', label: 'The final moonlight' },
+  { id: 'invitation' },
+  { id: 'birthday' },
+  { id: 'smile' },
+  { id: 'moments' },
+  { id: 'adore' },
+  { id: 'letter' },
+  { id: 'surprise' },
+  { id: 'wish' },
+  { id: 'finale' },
 ] as const;
 
 export function goTo(id: string) {
@@ -22,6 +24,7 @@ export function goTo(id: string) {
 /** "Revisit a moment" — a calm list of chapters in a modal dialog. */
 export function ChapterNav({ open, onClose }: { open: boolean; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const ui = useUi();
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
@@ -39,7 +42,7 @@ export function ChapterNav({ open, onClose }: { open: boolean; onClose: () => vo
       <div className="p-7">
         <div className="flex items-center justify-between">
           <h2 id="chapters-title" className="kicker">
-            Revisit a moment
+            {ui.chaptersTitle}
           </h2>
           <button
             type="button"
@@ -64,7 +67,7 @@ export function ChapterNav({ open, onClose }: { open: boolean; onClose: () => vo
                 <span className="w-6 text-xs tabular-nums text-champagne">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <span className="display text-xl">{c.label}</span>
+                <span className="display text-xl">{ui.chapters[i]}</span>
               </button>
             </li>
           ))}

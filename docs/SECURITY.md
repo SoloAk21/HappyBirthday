@@ -18,7 +18,7 @@ public GitHub repo, a link preview, or a search engine.
 | Asset | Where | Access |
 |---|---|---|
 | Story text, letter, captions, media list | private Blob `private/content.json` | `GET /api/content` — session required |
-| Photos (WebP) & videos (MP4) | private Blob `private/media/*` | `GET /api/media/:file` — session required, Range supported |
+| Photos (WebP), videos (MP4), music (M4A, only if licensed) | private Blob `private/media/*` | `GET /api/media/:file` — session required, Range supported |
 | Passphrase | only its scrypt hash, in a Vercel env var | never sent to the client |
 | Session signing key | Vercel env var | server only |
 
@@ -33,6 +33,9 @@ public GitHub repo, a link preview, or a search engine.
 - **Session**: HMAC-SHA256 signed token (45 days) in an `HttpOnly; Secure;
   SameSite=Lax` cookie. No token in JS, URLs or storage. "Lock" deletes it;
   rotating `SESSION_SECRET` revokes every session at once.
+- **First load**: `/boot.js` asks `GET /api/content` with `X-Moon-Probe: 1`
+  while the bundle downloads. Without a session the answer is only
+  `{"authenticated":false}` (any other request gets `401`); with one, the content.
 - **Media requests**: every request — including each video Range request — is
   authenticated. File names must match a strict pattern (no paths). Responses are
   `Cache-Control: private` + `Vary: Cookie` so the CDN never stores them.

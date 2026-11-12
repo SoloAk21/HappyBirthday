@@ -9,6 +9,13 @@ const problems = [];
 const MEDIA = /\.(mp4|mov|webm|jpe?g|png|webp|avif|heic|gif|m4a|mp3|wav)$/i;
 const ALLOWED_MEDIA = [/^public\/brand\//, /^tests\/fixtures\/site\/media\//];
 const TEXT = /\.(ts|tsx|js|mjs|json|html|css|md|yml|yaml|txt|svg)$/i;
+// The generic, pre-unlock Amharic text lives in exactly one reviewed source file.
+// Its strings may appear in that file and in the built bundle, nowhere else.
+const PUBLIC_AM_FILE = 'src/i18n/public.ts';
+const publicAm = existsSync(PUBLIC_AM_FILE)
+  ? [...readFileSync(PUBLIC_AM_FILE, 'utf8').matchAll(/'([^']*[ሀ-፿][^']*)'/g)].map((m) => m[1])
+  : [];
+const stripPublicAm = (t) => publicAm.reduce((acc, s) => acc.split(s).join(''), t);
 
 const tracked = execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8' })
   .split('\n')
@@ -44,7 +51,8 @@ for (const f of files) {
     problems.push(`${f}: media file outside public/brand`);
   if (!TEXT.test(f) || f === 'scripts/check-public.mjs' || !existsSync(f)) continue;
   const text = readFileSync(f, 'utf8');
-  if (/[ሀ-፿]/.test(text))
+  const allowsAm = f === PUBLIC_AM_FILE || f.startsWith('dist/');
+  if (/[ሀ-፿]/.test(allowsAm ? stripPublicAm(text) : text))
     problems.push(`${f}: contains Ethiopic (Amharic) text — personal content belongs in .private`);
   for (const p of phrases)
     if (text.includes(p)) problems.push(`${f}: contains private phrase "${p.slice(0, 40)}…"`);

@@ -3,6 +3,7 @@ import { Moon } from '../components/Moon';
 import { unlock } from '../lib/api';
 import { DUR, EASE, gsap } from '../lib/motion';
 import { useGsap } from '../hooks/useGsap';
+import { PUBLIC_TEXT as T } from '../i18n/public';
 
 /** Public gate. Shows nothing personal; the server decides who gets in. */
 export function Unlock({ onUnlocked }: { onUnlocked: () => void }) {
@@ -36,17 +37,16 @@ export function Unlock({ onUnlocked }: { onUnlocked: () => void }) {
     const result = await unlock(value);
     setBusy(false);
     if (result.ok) return onUnlocked();
-    if (result.reason === 'wrong') setMessage('Not quite. Try the words again, softly.');
+    if (result.reason === 'wrong') setMessage(T.wrong);
     else if (result.reason === 'rate_limited')
-      setMessage(
-        `Let's pause a moment. Try again in ${Math.ceil((result.retryAfter ?? 60) / 60)} min.`,
-      );
-    else setMessage('The universe is still waking up. Please try again shortly.');
+      setMessage(T.rateLimited.replace('{min}', String(Math.ceil((result.retryAfter ?? 60) / 60))));
+    else setMessage(T.unavailable);
   }
 
   return (
     <main
       ref={scope}
+      lang={T.lang}
       className="relative mx-auto flex min-h-[100dvh] max-w-md flex-col items-center justify-center px-6 text-center"
       style={{ paddingBottom: 'calc(var(--safe-bottom) + 2rem)' }}
     >
@@ -54,16 +54,16 @@ export function Unlock({ onUnlocked }: { onUnlocked: () => void }) {
         <Moon />
       </div>
       <h1 data-reveal className="display text-4xl sm:text-5xl">
-        A little universe,
+        {T.title[0]}
         <br />
-        <em className="text-champagne">just for you.</em>
+        <span className="text-champagne">{T.title[1]}</span>
       </h1>
       <p data-reveal className="mt-5 text-sm text-ivory/70">
-        It opens with our secret words.
+        {T.subtitle}
       </p>
       <form data-reveal onSubmit={submit} className="mt-9 flex w-full flex-col gap-4" noValidate>
         <label htmlFor="passphrase" className="sr-only">
-          Secret words
+          {T.label}
         </label>
         <input
           id="passphrase"
@@ -74,7 +74,7 @@ export function Unlock({ onUnlocked }: { onUnlocked: () => void }) {
           autoCorrect="off"
           spellCheck={false}
           enterKeyHint="go"
-          placeholder="Our secret words"
+          placeholder={T.placeholder}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           aria-invalid={message ? true : undefined}
@@ -82,7 +82,7 @@ export function Unlock({ onUnlocked }: { onUnlocked: () => void }) {
           className="h-14 w-full rounded-full border border-white/15 bg-night-2/70 px-6 text-center text-base tracking-wide text-ivory placeholder:text-ivory/40 focus:border-champagne/70 focus:outline-none"
         />
         <button type="submit" className="btn w-full" disabled={busy}>
-          {busy ? 'Opening…' : 'Open'}
+          {busy ? T.opening : T.open}
         </button>
         <p
           id="unlock-status"

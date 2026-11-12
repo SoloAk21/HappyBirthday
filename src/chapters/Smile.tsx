@@ -82,17 +82,29 @@ export function Smile() {
       aria-labelledby="smile-title"
       className="chapter mx-auto max-w-5xl overflow-hidden"
     >
-      <p className="kicker text-center">Chapter III</p>
-      <h2 id="smile-title" className="sr-only">
-        The smile that changes everything
-      </h2>
-      <blockquote
-        data-original
-        lang="am"
-        className="ethiopic mx-auto mt-8 max-w-md text-center text-lg text-lavender sm:text-xl"
-      >
-        {c.smile.original}
-      </blockquote>
+      <p className="kicker text-center">{c.smile.kicker ?? 'Chapter III'}</p>
+      {c.smile.title ? (
+        <h2
+          id="smile-title"
+          data-original
+          className="display mt-5 text-center text-[clamp(2.6rem,11vw,4.5rem)]"
+        >
+          {c.smile.title}
+        </h2>
+      ) : (
+        <h2 id="smile-title" className="sr-only">
+          The smile that changes everything
+        </h2>
+      )}
+      {c.smile.original && (
+        <blockquote
+          data-original
+          lang="am"
+          className="ethiopic mx-auto mt-8 max-w-md text-center text-lg text-lavender sm:text-xl"
+        >
+          {c.smile.original}
+        </blockquote>
+      )}
 
       <div className="relative mx-auto mt-14 max-w-md">
         <div

@@ -11,7 +11,16 @@ import { ContentContext } from '../../src/components/ContentContext';
 import { Countdown } from '../../src/components/Countdown';
 import { Gallery } from '../../src/chapters/Gallery';
 import type { SiteContent } from '../../src/content/types';
-import { readMutedPreference, writeMutedPreference } from '../../src/lib/sound';
+import { Story } from '../../src/chapters/Story';
+import { Words } from '../../src/components/Words';
+import { ChapterNav } from '../../src/components/ChapterNav';
+import { DEFAULT_UI } from '../../src/content/ui';
+import { PUBLIC_TEXT } from '../../src/i18n/public';
+import {
+  readMutedPreference,
+  readVolumePreference,
+  writeMutedPreference,
+} from '../../src/lib/sound';
 
 const content = example as unknown as SiteContent;
 const withContent = (ui: React.ReactNode) =>
@@ -24,7 +33,18 @@ describe('Countdown', () => {
   it('shows remaining time before the birthday', () => {
     render(<Countdown cfg={cfg} now={() => Date.parse('2026-11-12T21:00:00Z')} />);
     expect(screen.getByTestId('countdown')).toHaveTextContent('01');
-    expect(screen.getByText('day')).toBeInTheDocument();
+    expect(screen.getByText('days')).toBeInTheDocument();
+  });
+  it('uses the labels from the content', () => {
+    render(
+      <Countdown
+        cfg={cfg}
+        now={() => Date.parse('2026-11-12T21:00:00Z')}
+        text={{ ...DEFAULT_UI, countdownTitle: 'Soon', countdownUnits: ['d', 'h', 'm', 's'] }}
+      />,
+    );
+    expect(screen.getByText('Soon')).toBeInTheDocument();
+    expect(screen.getByText('d')).toBeInTheDocument();
   });
   it('celebrates on the day', () => {
     render(<Countdown cfg={cfg} now={() => Date.parse('2026-11-14T08:00:00Z')} />);
@@ -93,9 +113,9 @@ describe('Unlock', () => {
       vi.fn(async () => new Response('{}', { status: 401 })),
     );
     render(<Unlock onUnlocked={() => {}} />);
-    await userEvent.type(screen.getByLabelText('Secret words'), 'wrong');
-    await userEvent.click(screen.getByRole('button', { name: 'Open' }));
-    expect(await screen.findByText(/Not quite/)).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText(PUBLIC_TEXT.label), 'wrong');
+    await userEvent.click(screen.getByRole('button', { name: PUBLIC_TEXT.open }));
+    expect(await screen.findByText(PUBLIC_TEXT.wrong)).toBeInTheDocument();
   });
 
   it('calls onUnlocked for the right words', async () => {
@@ -105,8 +125,8 @@ describe('Unlock', () => {
     );
     const done = vi.fn();
     render(<Unlock onUnlocked={done} />);
-    await userEvent.type(screen.getByLabelText('Secret words'), 'right words');
-    await userEvent.click(screen.getByRole('button', { name: 'Open' }));
+    await userEvent.type(screen.getByLabelText(PUBLIC_TEXT.label), 'right words');
+    await userEvent.click(screen.getByRole('button', { name: PUBLIC_TEXT.open }));
     await waitFor(() => expect(done).toHaveBeenCalled());
   });
 });
@@ -115,10 +135,10 @@ describe('App', () => {
   it('shows the gate when locked and nothing personal', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => new Response('{"authenticated":false}')),
+      vi.fn(async () => new Response('{"error":"unauthorized"}', { status: 401 })),
     );
     render(<App />);
-    expect(await screen.findByLabelText('Secret words')).toBeInTheDocument();
+    expect(await screen.findByLabelText(PUBLIC_TEXT.label)).toBeInTheDocument();
     expect(document.body).not.toHaveTextContent(content.reveal.title);
   });
 
@@ -157,5 +177,48 @@ describe('mute preference', () => {
     expect(readMutedPreference(s)).toBe(false);
     writeMutedPreference(true, s);
     expect(readMutedPreference(s)).toBe(true);
+  });
+});
+
+describe('Amharic-ready text', () => {
+  // Built from code points so this public test file holds no Ethiopic literals.
+  const syllables = (...cps: number[]) => String.fromCodePoint(...cps);
+  const word1 = syllables(0x1230, 0x120b, 0x121d); // three Ethiopic syllables
+  const word2 = syllables(0x12e8, 0x1294, 0x1328, 0x1228, 0x1243, 0x1362);
+  const phrase = `${word1} ${word2}`;
+
+  it('splits only at spaces, never inside an Ethiopic syllable', () => {
+    const { container } = render(<Words text={phrase} />);
+    const words = [...container.querySelectorAll('[data-word]')].map((w) => w.textContent);
+    expect(words).toEqual([word1, word2]);
+    expect(container.querySelector('.sr-only')?.textContent).toBe(phrase);
+  });
+
+  it('renders the story lines in order with their frames', () => {
+    const { container } = withContent(<Story />);
+    const lines = [...container.querySelectorAll('[data-story-line]')].map((l) => l.textContent);
+    expect(lines).toEqual(content.story!.beats.flatMap((b) => b.lines));
+    expect(screen.getByRole('heading', { name: content.story!.title! })).toBeInTheDocument();
+  });
+
+  it('labels the chapter list from the content', () => {
+    const ui = { ...content, ui: { chaptersTitle: 'Moments', chapters: ['One'] } };
+    render(
+      <ContentContext.Provider value={ui as SiteContent}>
+        <ChapterNav open={false} onClose={() => {}} />
+      </ContentContext.Provider>,
+    );
+    expect(screen.getByText('Moments', { selector: 'h2' })).toBeInTheDocument();
+    expect(screen.getByText('One')).toBeInTheDocument();
+    // missing labels fall back to the defaults
+    expect(screen.getByText(DEFAULT_UI.chapters[8]!)).toBeInTheDocument();
+  });
+});
+
+describe('volume preference', () => {
+  it('defaults to 0.8 and ignores invalid values', () => {
+    expect(readVolumePreference({ getItem: () => null })).toBe(0.8);
+    expect(readVolumePreference({ getItem: () => '0.3' })).toBe(0.3);
+    expect(readVolumePreference({ getItem: () => '7' })).toBe(0.8);
   });
 });

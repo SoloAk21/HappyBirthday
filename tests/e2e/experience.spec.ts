@@ -1,12 +1,13 @@
 import AxeBuilder from '@axe-core/playwright';
+import { PUBLIC_TEXT as T } from '../../src/i18n/public.js';
 import { expect, test, type Page } from '@playwright/test';
 
 const PASSPHRASE = 'little moon test';
 
 async function unlock(page: Page) {
   await page.goto('/');
-  await page.getByLabel('Secret words').fill(PASSPHRASE);
-  await page.getByRole('button', { name: 'Open', exact: true }).click();
+  await page.getByLabel(T.label).fill(PASSPHRASE);
+  await page.getByRole('button', { name: T.open, exact: true }).click();
   await expect(page.getByRole('button', { name: /Open the Surprise/ })).toBeVisible();
 }
 
@@ -24,7 +25,7 @@ function collectErrors(page: Page) {
 test.describe('privacy gate', () => {
   test('public page reveals nothing personal and media is locked', async ({ page, request }) => {
     await page.goto('/');
-    await expect(page.getByLabel('Secret words')).toBeVisible();
+    await expect(page.getByLabel(T.label)).toBeVisible();
     await expect(page).toHaveTitle('A Little Universe');
     const html = await page.content();
     expect(html).not.toContain('Happy Birthday');
@@ -38,9 +39,9 @@ test.describe('privacy gate', () => {
 
   test('wrong words are refused kindly', async ({ page }) => {
     await page.goto('/');
-    await page.getByLabel('Secret words').fill('not the words');
-    await page.getByRole('button', { name: 'Open', exact: true }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Not quite' })).toBeVisible();
+    await page.getByLabel(T.label).fill('not the words');
+    await page.getByRole('button', { name: T.open, exact: true }).click();
+    await expect(page.getByRole('status').filter({ hasText: T.wrong })).toBeVisible();
   });
 
   test('locking again revokes access', async ({ page }) => {
@@ -77,6 +78,12 @@ test.describe('the experience', () => {
       await expect(section).toBeVisible();
     }
 
+    // The story sequence: every line arrives, and the frame follows the story.
+    const lastLine = page.locator('[data-story-line]').last();
+    await lastLine.scrollIntoViewIfNeeded();
+    await expect(lastLine).toHaveText('The line that lands.');
+    await expect.poll(() => lastLine.evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+
     // Images actually decode (served through the authenticated API).
     await page.locator('#birthday').scrollIntoViewIfNeeded();
     const portrait = page.locator('#birthday img').first();
@@ -110,7 +117,8 @@ test.describe('the experience', () => {
   test('gallery viewer: open, navigate, close; video streams', async ({ page, browserName }) => {
     await unlock(page);
     await page.getByRole('button', { name: /Open the Surprise/ }).click();
-    await page.locator('#moments').scrollIntoViewIfNeeded();
+    // the cards come after the story sequence
+    await page.getByRole('list', { name: 'Memories' }).scrollIntoViewIfNeeded();
     await page.getByRole('button', { name: 'Watch: Our little film' }).click();
     const dialog = page.getByRole('dialog', { name: 'Memory viewer' });
     await expect(dialog).toBeVisible();
@@ -128,12 +136,47 @@ test.describe('the experience', () => {
     await expect(dialog).toBeHidden();
   });
 
+  test('music starts only after the tap and can be paused, resumed and turned down', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName === 'webkit' && process.platform === 'win32',
+      "Windows WebKit build can't decode AAC/MP4",
+    );
+    const musicRequests: number[] = [];
+    page.on('response', (r) => {
+      if (r.url().endsWith('/api/media/music.m4a')) musicRequests.push(r.status());
+    });
+    await unlock(page);
+    await expect(page.getByRole('button', { name: /Open the Surprise/ })).toBeVisible();
+    expect(musicRequests).toEqual([]); // nothing before her tap
+    await page.getByRole('button', { name: /Open the Surprise/ }).click();
+
+    const audio = page.locator('audio[data-music]');
+    await expect(audio).toHaveCount(1);
+    await expect
+      .poll(() => audio.evaluate((a: HTMLAudioElement) => a.currentTime), { timeout: 15000 })
+      .toBeGreaterThan(0.3);
+    expect(musicRequests.length).toBeGreaterThan(0);
+    expect(musicRequests.every((s) => s === 200 || s === 206)).toBe(true);
+
+    await page.getByRole('button', { name: 'Turn sound off' }).first().click(); // opens the panel
+    await page.getByRole('button', { name: 'Pause music' }).click();
+    await expect.poll(() => audio.evaluate((a: HTMLAudioElement) => a.paused)).toBe(true);
+    await page.getByRole('button', { name: 'Play music' }).click();
+    await expect.poll(() => audio.evaluate((a: HTMLAudioElement) => a.paused)).toBe(false);
+    await page.getByRole('slider', { name: 'Music volume' }).fill('40');
+    expect(await page.evaluate(() => sessionStorage.getItem('moon:volume'))).toBe('0.4');
+    await expect(audio).toHaveCount(1); // never a second player
+  });
+
   test('works with the keyboard alone', async ({ page, browserName }) => {
     test.skip(browserName === 'webkit', 'WebKit does not Tab to buttons by default');
     await page.goto('/');
-    await expect(page.getByLabel('Secret words')).toBeVisible();
+    await expect(page.getByLabel(T.label)).toBeVisible();
     await page.keyboard.press('Tab');
-    await expect(page.getByLabel('Secret words')).toBeFocused();
+    await expect(page.getByLabel(T.label)).toBeFocused();
     await page.keyboard.type(PASSPHRASE);
     await page.keyboard.press('Enter');
     const open = page.getByRole('button', { name: /Open the Surprise/ });
@@ -185,15 +228,15 @@ test.describe('accessibility', () => {
   test('gate and experience have no serious axe violations', async ({ page, browserName }) => {
     test.skip(browserName !== 'chromium', 'axe audit runs once');
     await page.goto('/');
-    await expect(page.getByLabel('Secret words')).toBeVisible();
+    await expect(page.getByLabel(T.label)).toBeVisible();
     const gate = await new AxeBuilder({ page }).analyze();
     expect(gate.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''))).toEqual(
       [],
     );
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.getByLabel('Secret words').fill(PASSPHRASE);
-    await page.getByRole('button', { name: 'Open', exact: true }).click();
+    await page.getByLabel(T.label).fill(PASSPHRASE);
+    await page.getByRole('button', { name: T.open, exact: true }).click();
     await page.getByRole('button', { name: /Open the Surprise/ }).click();
     await page.locator('#finale').scrollIntoViewIfNeeded();
     const exp = await new AxeBuilder({ page }).exclude('canvas').analyze();

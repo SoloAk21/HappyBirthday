@@ -2,7 +2,7 @@
 //   .private/content.source.json + .private/media/manifest.json
 //     -> .private/site/content.json  (+ media copied to .private/site/media/)
 // Usage: node scripts/build-content.mjs [sourceJson] [mediaDir] [outDir]
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { validateContent } from './content-schema.mjs';
 
@@ -36,12 +36,17 @@ if (errors.length) {
   process.exit(1);
 }
 
+// start clean so nothing unreferenced (e.g. a withdrawn track) is ever uploaded
+await rm(join(out, 'media'), { recursive: true, force: true });
 await mkdir(join(out, 'media'), { recursive: true });
 const files = new Set();
 for (const a of Object.values(media)) {
   if (a.file) files.add(a.file);
   for (const v of [...(a.poster ?? []), ...(a.variants ?? [])]) files.add(v.file);
 }
+// A music track is only bundled when the content names it (i.e. once its
+// publication rights are confirmed) and the processed file is in mediaDir.
+if (site.music) files.add(site.music.file);
 for (const f of files) await copyFile(join(mediaDir, f), join(out, 'media', f));
 await writeFile(join(out, 'content.json'), JSON.stringify(site));
 console.log(

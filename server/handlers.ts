@@ -140,7 +140,13 @@ export async function handleSession(req: Request, cfg = configFromEnv()): Promis
 export async function handleContent(req: Request, cfg = configFromEnv()): Promise<Response> {
   if (req.method !== 'GET') return json({ error: 'method_not_allowed' }, 405);
   if (misconfigured(cfg)) return json({ error: 'not_configured' }, 503);
-  if (!isAuthenticated(req, cfg)) return json({ error: 'unauthorized' }, 401);
+  if (!isAuthenticated(req, cfg)) {
+    // The app's first-load probe asks politely so an anonymous visit does not
+    // log a failed request; it still receives nothing but this flag.
+    return req.headers.get('x-moon-probe') === '1'
+      ? json({ authenticated: false }, 200, { Vary: 'Cookie' })
+      : json({ error: 'unauthorized' }, 401);
+  }
   const obj = await cfg.storage.get('content.json');
   if (!obj) return json({ error: 'not_found' }, 404);
   return new Response(obj.body, {
@@ -154,7 +160,7 @@ export async function handleContent(req: Request, cfg = configFromEnv()): Promis
 }
 
 /** Only flat, known-shaped filenames: no paths, no traversal. */
-export const MEDIA_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.mp4|-\d{2,4}\.webp)$/;
+export const MEDIA_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.mp4|\.m4a|-\d{2,4}\.webp)$/;
 
 export function parseRange(header: string | null, size: number): ByteRange | 'invalid' | undefined {
   if (!header) return undefined;

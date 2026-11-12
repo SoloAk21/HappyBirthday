@@ -1,12 +1,17 @@
 /**
- * Original, synthesized sound design (Web Audio API) — no third-party
- * recordings, so nothing to license. Nothing is created until the visitor
- * taps; audio is always optional and the experience is complete without it.
+ * Sound for the experience (Web Audio API). By default an original,
+ * synthesized score plays — nothing to license. When the private content names
+ * a music track (one the owner has the rights to publish), that recording plays
+ * instead, streamed from the authenticated media route. Nothing is created
+ * until the visitor taps; audio is always optional.
  */
+import { mediaUrl } from './api';
 
 const PREF_KEY = 'moon:muted';
+const VOLUME_KEY = 'moon:volume';
 
 type Listener = (muted: boolean) => void;
+type AudioSessionNavigator = Navigator & { audioSession?: { type: string } };
 
 const NOTE = (n: number) => 440 * Math.pow(2, (n - 69) / 12);
 // Gentle progression: Dmaj9 → Bm9 → Gmaj7(#11) → A6sus
@@ -39,6 +44,17 @@ export function writeMutedPreference(
   }
 }
 
+export function readVolumePreference(
+  storage: Pick<Storage, 'getItem'> | undefined = safeSession(),
+): number {
+  try {
+    const v = Number(storage?.getItem(VOLUME_KEY));
+    return Number.isFinite(v) && v > 0 && v <= 1 ? v : 0.8;
+  } catch {
+    return 0.8;
+  }
+}
+
 function safeSession(): Storage | undefined {
   try {
     return typeof window === 'undefined' ? undefined : window.sessionStorage;
@@ -56,8 +72,24 @@ class SoundEngine {
   private chordIndex = 0;
   private lastFx = new Map<string, number>();
   private listeners = new Set<Listener>();
+  private trackFile: string | null = null;
+  private audio: HTMLAudioElement | null = null;
+  private trackGain: GainNode | null = null;
+  private ducked = false;
   muted = readMutedPreference();
+  /** Music paused by the visitor (independent of mute). */
+  paused = false;
+  volume = readVolumePreference();
   started = false;
+
+  /** Use a recorded track instead of the synthesized score. Call before start(). */
+  setTrack(file: string) {
+    if (!this.started) this.trackFile = file;
+  }
+
+  get hasTrack() {
+    return this.trackFile !== null;
+  }
 
   subscribe(fn: Listener) {
     this.listeners.add(fn);
@@ -105,17 +137,108 @@ class SoundEngine {
     this.fx.connect(this.echo);
 
     document.addEventListener('visibilitychange', this.onVisibility);
-    this.playChord();
-    window.setInterval(() => this.playChord(), 9000);
-    window.setInterval(() => this.sparkle(), 2600);
+    // Any later tap restores audio that the system interrupted (calls, Siri,
+    // another app taking the audio focus, iOS suspending the context).
+    document.addEventListener('pointerdown', this.recover, { passive: true });
+    if (this.trackFile) this.startTrack(ctx, this.trackFile);
+    else {
+      this.playChord();
+      window.setInterval(() => this.playChord(), 9000);
+      window.setInterval(() => this.sparkle(), 2600);
+    }
     this.applyMute(true);
   }
 
+  /** One <audio> element for the whole visit, routed straight to the output. */
+  private startTrack(ctx: AudioContext, file: string) {
+    const nav = navigator as AudioSessionNavigator;
+    // iOS 17+: play like music (ignores the ring/silent switch, as video does).
+    if (nav.audioSession) nav.audioSession.type = 'playback';
+    const audio = new Audio(mediaUrl(file));
+    audio.loop = true;
+    audio.preload = 'auto';
+    // kept in the document (hidden) so there is exactly one, inspectable player
+    audio.hidden = true;
+    audio.dataset.music = '';
+    document.body.appendChild(audio);
+    this.audio = audio;
+    this.trackGain = ctx.createGain();
+    this.trackGain.gain.value = 0;
+    ctx.createMediaElementSource(audio).connect(this.trackGain).connect(ctx.destination);
+    if (!this.muted) void audio.play().catch(() => {});
+  }
+
+  private musicLevel() {
+    if (this.muted || this.paused) return 0;
+    return this.volume * (this.ducked ? 0.35 : 1);
+  }
+
+  private rampTrack(seconds: number) {
+    const { ctx, trackGain } = this;
+    if (!ctx || !trackGain) return;
+    const t = ctx.currentTime;
+    trackGain.gain.cancelScheduledValues(t);
+    trackGain.gain.setValueAtTime(trackGain.gain.value, t);
+    trackGain.gain.linearRampToValueAtTime(this.musicLevel(), t + seconds);
+  }
+
+  private get shouldPlay() {
+    return !!this.audio && !this.muted && !this.paused && !document.hidden;
+  }
+
+  private recover = () => {
+    if (!this.ctx || this.muted) return;
+    if (this.ctx.state !== 'running') void this.ctx.resume();
+    if (this.shouldPlay && this.audio!.paused) void this.audio!.play().catch(() => {});
+  };
+
   private onVisibility = () => {
     if (!this.ctx) return;
-    if (document.hidden) void this.ctx.suspend();
-    else if (!this.muted) void this.ctx.resume();
+    if (document.hidden) {
+      this.audio?.pause();
+      void this.ctx.suspend();
+    } else if (!this.muted) {
+      void this.ctx.resume();
+      if (this.shouldPlay) void this.audio!.play().catch(() => {});
+    }
   };
+
+  /** Pause / resume the music (sound effects keep working). */
+  setPaused(paused: boolean) {
+    if (!this.audio || paused === this.paused) return;
+    this.paused = paused;
+    if (paused) {
+      this.rampTrack(0.6);
+      window.setTimeout(() => this.paused && this.audio?.pause(), 650);
+    } else {
+      if (this.ctx?.state !== 'running') void this.ctx?.resume();
+      void this.audio.play().catch(() => {});
+      this.rampTrack(1.2);
+    }
+    this.emit();
+  }
+
+  setVolume(v: number) {
+    this.volume = Math.min(1, Math.max(0.05, v));
+    try {
+      safeSession()?.setItem(VOLUME_KEY, String(this.volume));
+    } catch {
+      /* not remembered */
+    }
+    this.rampTrack(0.15);
+    this.emit();
+  }
+
+  /** Softens the music while something needs attention (e.g. reading the letter). */
+  duck(on: boolean) {
+    if (on === this.ducked) return;
+    this.ducked = on;
+    this.rampTrack(1.4);
+  }
+
+  private emit() {
+    this.listeners.forEach((l) => l(this.muted));
+  }
 
   toggle() {
     this.setMuted(!this.muted);
@@ -125,7 +248,7 @@ class SoundEngine {
     this.muted = muted;
     writeMutedPreference(muted);
     this.applyMute(false);
-    this.listeners.forEach((l) => l(muted));
+    this.emit();
   }
 
   private applyMute(initial: boolean) {
@@ -139,7 +262,11 @@ class SoundEngine {
     } else {
       void ctx.resume();
       master.gain.linearRampToValueAtTime(0.5, t + (initial ? 3 : 0.6));
+      if (this.shouldPlay && this.audio!.paused) void this.audio!.play().catch(() => {});
     }
+    // the recording fades separately (it bypasses the synth's compressor/echo)
+    this.rampTrack(this.muted ? 0.4 : initial ? 3 : 0.8);
+    if (this.muted && this.audio) window.setTimeout(() => this.muted && this.audio?.pause(), 450);
   }
 
   private playChord() {

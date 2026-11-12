@@ -3,12 +3,14 @@ import { Countdown } from '../components/Countdown';
 import { useContent } from '../components/ContentContext';
 import { Moon } from '../components/Moon';
 import { Words } from '../components/Words';
+import { useUi } from '../content/ui';
 import { useGsap } from '../hooks/useGsap';
 import { DUR, EASE, STAGGER, gsap } from '../lib/motion';
 
 /** Scene 1 — Hey, My Moon. */
 export function Invitation({ opened, onOpen }: { opened: boolean; onOpen: () => void }) {
   const c = useContent();
+  const ui = useUi();
   const scope = useRef<HTMLElement>(null);
 
   useGsap(scope, () => {
@@ -69,10 +71,10 @@ export function Invitation({ opened, onOpen }: { opened: boolean; onOpen: () => 
           </button>
         ) : (
           <a href="#birthday" className="btn btn-ghost">
-            Continue ↓
+            {ui.continue} <span aria-hidden="true">↓</span>
           </a>
         )}
-        <Countdown cfg={c.birthday} />
+        <Countdown cfg={c.birthday} text={ui} />
       </div>
     </section>
   );

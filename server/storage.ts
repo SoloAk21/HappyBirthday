@@ -32,6 +32,7 @@ export interface PrivateStorage {
 
 const TYPES: Record<string, string> = {
   mp4: 'video/mp4',
+  m4a: 'audio/mp4',
   webp: 'image/webp',
   json: 'application/json; charset=utf-8',
   jpg: 'image/jpeg',

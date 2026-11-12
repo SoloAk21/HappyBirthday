@@ -61,7 +61,8 @@
         "label": "And this",
         "text": "Placeholder note two."
       }
-    ]
+    ],
+    "quote": "A placeholder quote, shown with restraint."
   },
   "letter": {
     "kicker": "Chapter VI",
@@ -70,7 +71,8 @@
     "salutation": "My Moon,",
     "paragraphs": ["Placeholder paragraph — replace with your own words."],
     "closing": "With all my love,",
-    "signature": "Your Name"
+    "signature": "Your Name",
+    "highlight": "A placeholder highlighted paragraph."
   },
   "gift": {
     "kicker": "Chapter VII",
@@ -163,5 +165,25 @@
         }
       ]
     }
+  },
+  "story": {
+    "kicker": "Chapter IV",
+    "title": "How it began",
+    "beats": [
+      {
+        "media": {
+          "id": "smile-loop",
+          "alt": "Smiling clip"
+        },
+        "lines": ["Placeholder story line one.", "Placeholder story line two."]
+      },
+      {
+        "media": {
+          "id": "together",
+          "alt": "A photo of us"
+        },
+        "lines": ["Placeholder story line three.", "The line that lands."]
+      }
+    ]
   }
 }

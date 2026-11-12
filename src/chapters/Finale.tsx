@@ -4,6 +4,7 @@ import { useContent } from '../components/ContentContext';
 import { Moon } from '../components/Moon';
 import { Picture } from '../components/Media';
 import { Words } from '../components/Words';
+import { useUi } from '../content/ui';
 import { useGsap } from '../hooks/useGsap';
 import { DUR, EASE, STAGGER, ScrollTrigger, gsap } from '../lib/motion';
 import { sound } from '../lib/sound';
@@ -12,6 +13,7 @@ import { sound } from '../lib/sound';
 export function Finale({ onReplay, onMoments }: { onReplay: () => void; onMoments: () => void }) {
   const c = useContent();
   const f = c.finale;
+  const ui = useUi();
   const scope = useRef<HTMLElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
 
@@ -91,7 +93,7 @@ export function Finale({ onReplay, onMoments }: { onReplay: () => void; onMoment
       >
         <Moon />
       </div>
-      <p className="kicker">Chapter IX</p>
+      <p className="kicker">{f.kicker ?? 'Chapter IX'}</p>
 
       <div data-final-photo className="frame mt-10 aspect-[4/5] w-[min(84vw,400px)]">
         <Picture media={f.photo} sizes="(min-width: 640px) 400px, 84vw" />
@@ -117,10 +119,10 @@ export function Finale({ onReplay, onMoments }: { onReplay: () => void; onMoment
 
       <div data-actions className="mt-14 flex flex-col items-center gap-4 sm:flex-row">
         <button type="button" className="btn" onClick={onReplay}>
-          ↺ Replay from the beginning
+          <span aria-hidden="true">↺</span> {ui.replay}
         </button>
         <button type="button" className="btn btn-ghost" onClick={onMoments}>
-          Revisit a moment
+          {ui.revisit}
         </button>
       </div>
     </section>

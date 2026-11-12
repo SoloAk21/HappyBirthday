@@ -26,7 +26,7 @@ export function Words({
           <span
             key={i}
             aria-hidden="true"
-            className="inline-block overflow-hidden pb-[0.12em] align-bottom"
+            className="word-clip inline-block overflow-hidden pb-[0.12em] align-bottom"
           >
             <span data-word className="inline-block will-change-transform">
               {w}
