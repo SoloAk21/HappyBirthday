@@ -20,6 +20,8 @@ export function Letter() {
     sound.paper();
     if (prefersReducedMotion() || !envelope.current) return setState('open');
     setState('opening');
+    // safety net: never leave her waiting if the animation is interrupted
+    window.setTimeout(() => setState((s) => (s === 'opening' ? 'open' : s)), 4500);
     const env = envelope.current;
     gsap
       .timeline({ onComplete: () => setState('open') })

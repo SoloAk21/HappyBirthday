@@ -20,6 +20,8 @@ export function Gift() {
     sound.reveal();
     if (prefersReducedMotion()) return setState('open');
     setState('opening');
+    // safety net: never leave her waiting if the animation is interrupted
+    window.setTimeout(() => setState((s) => (s === 'opening' ? 'open' : s)), 4500);
     const el = box.current!;
     const tl = gsap.timeline({ onComplete: () => setState('open') });
     tl.to(el, { rotate: -4, duration: 0.09, yoyo: true, repeat: 3, ease: 'sine.inOut' })

@@ -100,7 +100,7 @@ export function BirthdayReveal() {
 
       <div className="mt-16 grid items-end gap-10 md:grid-cols-[1.1fr_1fr]">
         <div data-portrait className="frame mx-auto aspect-[4/5] w-full max-w-md">
-          <Picture media={c.reveal.portrait} sizes="(min-width: 768px) 28rem, 90vw" />
+          <Picture media={c.reveal.portrait} sizes="(min-width: 768px) 28rem, 90vw" eager />
         </div>
         <h2
           ref={title}

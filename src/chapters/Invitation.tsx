@@ -34,7 +34,7 @@ export function Invitation({ opened, onOpen }: { opened: boolean; onOpen: () => 
         { yPercent: 110, duration: DUR.slow, stagger: STAGGER.words / 2, ease: EASE.settle },
         0.55,
       )
-      .from('[data-cta]', { autoAlpha: 0, y: 12, duration: DUR.slow }, 0.85);
+      .from('[data-cta]', { autoAlpha: 0, y: 12, duration: DUR.slow }, 0.45);
     // the moon breathes, very slowly
     gsap.to('[data-moon]', {
       y: -8,
