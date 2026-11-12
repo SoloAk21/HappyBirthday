@@ -63,7 +63,7 @@ export function Invitation({ opened, onOpen }: { opened: boolean; onOpen: () => 
       <h1 id="invitation-title" data-greeting className="display text-[clamp(3rem,13vw,6rem)]">
         <Words text={c.invitation.greeting} />
       </h1>
-      <p data-line className="prose-serif mt-4 italic text-ivory/80">
+      <p data-line className="prose-serif mt-4 min-h-[2lh] italic text-ivory/80">
         <Words text={c.invitation.line} />
       </p>
       <div data-cta className="mt-10 flex flex-col items-center gap-10">
