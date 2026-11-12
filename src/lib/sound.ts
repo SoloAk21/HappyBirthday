@@ -144,8 +144,7 @@ class SoundEngine {
       // with a real song, the little interface chimes stay in the background
       this.fx.gain.value = 0.3;
       this.startTrack(ctx, this.trackFile);
-    }
-    else {
+    } else {
       this.playChord();
       window.setInterval(() => this.playChord(), 9000);
       window.setInterval(() => this.sparkle(), 2600);
