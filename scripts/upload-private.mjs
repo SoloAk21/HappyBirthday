@@ -13,6 +13,7 @@ if (!process.env.BLOB_READ_WRITE_TOKEN) {
 const types = {
   mp4: 'video/mp4',
   m4a: 'audio/mp4',
+  woff2: 'font/woff2',
   webp: 'image/webp',
   json: 'application/json',
 };

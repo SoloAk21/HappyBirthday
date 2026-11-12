@@ -160,7 +160,7 @@ export async function handleContent(req: Request, cfg = configFromEnv()): Promis
 }
 
 /** Only flat, known-shaped filenames: no paths, no traversal. */
-export const MEDIA_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.mp4|\.m4a|-\d{2,4}\.webp)$/;
+export const MEDIA_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.mp4|\.m4a|\.woff2|-\d{2,4}\.webp)$/;
 
 export function parseRange(header: string | null, size: number): ByteRange | 'invalid' | undefined {
   if (!header) return undefined;

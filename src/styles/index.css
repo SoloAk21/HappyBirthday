@@ -25,10 +25,15 @@
   --color-paper: #f4ecdc;
   --color-ink: #2a2440;
 
-  --font-serif: 'Cormorant Garamond', 'Noto Sans Ethiopic', Georgia, serif;
+  /* 'Moon Heading' / 'Moon Body' are private Ethiopic-only faces loaded after
+     unlock (src/lib/fonts.ts); until then — and on the public unlock screen —
+     Noto Sans Ethiopic stands in. Latin always uses Cormorant / Manrope. */
+  --font-display: 'Moon Heading', 'Cormorant Garamond', 'Noto Sans Ethiopic', Georgia, serif;
+  --font-serif: 'Moon Body', 'Cormorant Garamond', 'Noto Sans Ethiopic', Georgia, serif;
   --font-sans:
-    'Manrope Variable', 'Noto Sans Ethiopic', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-ethiopic: 'Noto Sans Ethiopic', 'Manrope Variable', sans-serif;
+    'Manrope Variable', 'Moon Body', 'Noto Sans Ethiopic', system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --font-ethiopic: 'Moon Heading', 'Noto Sans Ethiopic', 'Manrope Variable', sans-serif;
 }
 
 @layer base {
@@ -88,7 +93,7 @@
 
 @layer components {
   .display {
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
     font-weight: 300;
     letter-spacing: -0.01em;
     line-height: 1.02;

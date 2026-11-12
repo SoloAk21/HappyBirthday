@@ -17,6 +17,7 @@ import type { SiteContent } from './content/types';
 import { resolveUi } from './content/ui';
 import { PUBLIC_TEXT as T } from './i18n/public';
 import { loadContent } from './lib/api';
+import { loadPrivateFonts } from './lib/fonts';
 import { ScrollTrigger, gsap, prefersReducedMotion } from './lib/motion';
 import { sound } from './lib/sound';
 
@@ -36,8 +37,9 @@ export default function App() {
     try {
       const c = await loadContent();
       if (!c) return setStatus('locked');
-      setContent(c);
       if (c.music) sound.setTrack(c.music.file);
+      await loadPrivateFonts(c.fonts);
+      setContent(c);
       const ui = resolveUi(c.ui);
       document.title = ui.documentTitle;
       document.documentElement.lang = ui.lang;

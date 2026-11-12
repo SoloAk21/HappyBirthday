@@ -47,6 +47,7 @@ for (const a of Object.values(media)) {
 // A music track is only bundled when the content names it (i.e. once its
 // publication rights are confirmed) and the processed file is in mediaDir.
 if (site.music) files.add(site.music.file);
+for (const f of Object.values(site.fonts ?? {})) if (f) files.add(f);
 for (const f of files) await copyFile(join(mediaDir, f), join(out, 'media', f));
 await writeFile(join(out, 'content.json'), JSON.stringify(site));
 console.log(

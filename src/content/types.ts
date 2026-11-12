@@ -91,9 +91,18 @@ export interface MusicTrack {
   title?: string;
 }
 
+/** Private Ethiopic faces (licensed by the owner), served only after unlock. */
+export interface PrivateFonts {
+  /** Headings and large statements. */
+  heading?: string;
+  /** Descriptions, captions and the letter. */
+  body?: string;
+}
+
 export interface SiteContent {
   ui?: UiText;
   music?: MusicTrack;
+  fonts?: PrivateFonts;
   recipientName: string;
   senderName: string;
   birthday: BirthdayConfig;

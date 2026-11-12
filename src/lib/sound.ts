@@ -140,7 +140,11 @@ class SoundEngine {
     // Any later tap restores audio that the system interrupted (calls, Siri,
     // another app taking the audio focus, iOS suspending the context).
     document.addEventListener('pointerdown', this.recover, { passive: true });
-    if (this.trackFile) this.startTrack(ctx, this.trackFile);
+    if (this.trackFile) {
+      // with a real song, the little interface chimes stay in the background
+      this.fx.gain.value = 0.3;
+      this.startTrack(ctx, this.trackFile);
+    }
     else {
       this.playChord();
       window.setInterval(() => this.playChord(), 9000);

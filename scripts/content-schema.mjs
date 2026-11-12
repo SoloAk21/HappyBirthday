@@ -1,7 +1,7 @@
 // Lightweight validation of the private content bundle (shared by the
 // build script and unit tests). Returns a list of human-readable problems.
 
-const MEDIA_FILE = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.mp4|\.m4a|-\d{2,4}\.webp)$/;
+const MEDIA_FILE = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.mp4|\.m4a|\.woff2|-\d{2,4}\.webp)$/;
 
 export function validateContent(c) {
   const errs = [];
@@ -54,6 +54,9 @@ export function validateContent(c) {
   });
   if (c.music && !/^[a-z0-9]+(?:-[a-z0-9]+)*\.m4a$/.test(c.music.file ?? ''))
     errs.push('music.file must be a safe .m4a file name');
+  for (const [k, f] of Object.entries(c.fonts ?? {}))
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*\.woff2$/.test(f ?? ''))
+      errs.push(`fonts.${k} must be a safe .woff2 name`);
   if (c.ui?.chapters && (!Array.isArray(c.ui.chapters) || c.ui.chapters.length !== 10))
     errs.push('ui.chapters must list all 10 navigation labels');
   ref(c.finale?.photo, 'finale.photo');

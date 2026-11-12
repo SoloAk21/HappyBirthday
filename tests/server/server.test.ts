@@ -224,6 +224,7 @@ describe('media helpers', () => {
       'final-1080.webp',
       'smile-loop-poster-544.webp',
       'music.m4a',
+      'heading.woff2',
     ])
       expect(MEDIA_NAME.test(ok)).toBe(true);
     for (const bad of [
