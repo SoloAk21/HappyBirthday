@@ -9,7 +9,7 @@ import { Notes } from '../../src/chapters/Notes';
 import { Unlock } from '../../src/chapters/Unlock';
 import { ContentContext } from '../../src/components/ContentContext';
 import { Countdown } from '../../src/components/Countdown';
-import { Gallery } from '../../src/chapters/Gallery';
+import { Gallery, rails } from '../../src/chapters/Gallery';
 import type { SiteContent } from '../../src/content/types';
 import { Story } from '../../src/chapters/Story';
 import { Words } from '../../src/components/Words';
@@ -220,5 +220,23 @@ describe('volume preference', () => {
     expect(readVolumePreference({ getItem: () => null })).toBe(0.8);
     expect(readVolumePreference({ getItem: () => '0.3' })).toBe(0.3);
     expect(readVolumePreference({ getItem: () => '7' })).toBe(0.8);
+  });
+});
+
+describe('gallery rails', () => {
+  it('groups consecutive items by rail and keeps their position for the viewer', () => {
+    const items = [
+      { id: 'a', alt: 'a', rail: 'Us' },
+      { id: 'b', alt: 'b', rail: 'Us' },
+      { id: 'c', alt: 'c', rail: 'You' },
+    ];
+    const r = rails(items);
+    expect(r.map((x) => x.title)).toEqual(['Us', 'You']);
+    expect(r[1]!.items[0]!.index).toBe(2);
+  });
+  it('keeps a single untitled row when no rails are set', () => {
+    expect(rails([{ id: 'a', alt: 'a' }])).toEqual([
+      { title: undefined, items: [{ item: { id: 'a', alt: 'a' }, index: 0 }] },
+    ]);
   });
 });

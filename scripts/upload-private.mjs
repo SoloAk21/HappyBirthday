@@ -16,7 +16,8 @@ const types = {
   webp: 'image/webp',
   json: 'application/json',
 };
-const files = ['content.json', ...(await readdir(join(dir, 'media'))).map((f) => `media/${f}`)];
+// Media first, content last: a live site never references a file that isn't there yet.
+const files = [...(await readdir(join(dir, 'media'))).map((f) => `media/${f}`), 'content.json'];
 for (const f of files) {
   const body = await readFile(join(dir, f));
   await put(prefix + f, body, {

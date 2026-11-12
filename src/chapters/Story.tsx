@@ -94,7 +94,7 @@ export function Story() {
               )}
             </div>
           ))}
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,#0b0f1f_0%,rgb(11_15_31/0.62)_22%,rgb(11_15_31/0.62)_78%,#0b0f1f_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,#0b0f1f_0%,rgb(11_15_31/0.5)_22%,rgb(11_15_31/0.5)_78%,#0b0f1f_100%)]" />
         </div>
 
         <ol className="relative -mt-[100dvh] pb-[28dvh] pt-[38dvh]">

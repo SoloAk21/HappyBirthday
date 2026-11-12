@@ -32,6 +32,8 @@ export interface MediaRef {
 
 export interface GalleryItem extends MediaRef {
   caption?: string;
+  /** Optional row title; consecutive items with the same rail share a row. */
+  rail?: string;
 }
 
 export interface Note {

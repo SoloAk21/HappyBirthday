@@ -38,27 +38,50 @@ export function Gallery() {
         </p>
       </div>
 
-      <ul
-        className="mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-[var(--gutter)] pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        aria-label="Memories"
-        tabIndex={0}
-      >
-        {c.gallery.items.map((item, i) => (
-          <li key={item.id} className="shrink-0 snap-center first:snap-start" data-reveal>
-            <Card
-              item={item}
-              featured={i === 0}
-              watch={ui.watch}
-              onOpen={() => (sound.chime(), setOpen(i))}
-            />
-          </li>
-        ))}
-        <li aria-hidden="true" className="w-1 shrink-0" />
-      </ul>
+      {rails(c.gallery.items).map((rail, r) => (
+        <div key={r} className={r === 0 ? 'mt-10' : 'mt-12'}>
+          {rail.title && (
+            <h3
+              data-reveal
+              className="display mx-auto mb-4 max-w-5xl px-[var(--gutter)] text-3xl text-champagne"
+            >
+              {rail.title}
+            </h3>
+          )}
+          <ul
+            className="flex snap-x snap-mandatory scroll-px-[var(--gutter)] gap-4 overflow-x-auto overscroll-x-contain px-[var(--gutter)] pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            aria-label={rail.title ?? 'Memories'}
+            tabIndex={0}
+          >
+            {rail.items.map(({ item, index }, k) => (
+              <li key={item.id} className="shrink-0 snap-center first:snap-start" data-reveal>
+                <Card
+                  item={item}
+                  featured={k === 0}
+                  watch={ui.watch}
+                  onOpen={() => (sound.chime(), setOpen(index))}
+                />
+              </li>
+            ))}
+            <li aria-hidden="true" className="w-1 shrink-0" />
+          </ul>
+        </div>
+      ))}
 
       <Lightbox items={c.gallery.items} index={open} onIndex={setOpen} />
     </section>
   );
+}
+
+/** Groups consecutive items that share a rail title, keeping their global index. */
+export function rails(items: GalleryItem[]) {
+  const out: { title?: string; items: { item: GalleryItem; index: number }[] }[] = [];
+  items.forEach((item, index) => {
+    const last = out[out.length - 1];
+    if (last && last.title === item.rail) last.items.push({ item, index });
+    else out.push({ title: item.rail, items: [{ item, index }] });
+  });
+  return out;
 }
 
 function Card({
