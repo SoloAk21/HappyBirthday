@@ -14,6 +14,8 @@ export function Invitation({ opened, onOpen }: { opened: boolean; onOpen: () => 
   const scope = useRef<HTMLElement>(null);
 
   useGsap(scope, () => {
+    // Overlapping entrances: everything has begun to appear within ~1 s, so
+    // the first screen is readable quickly while the motion still settles slowly.
     const tl = gsap.timeline({ defaults: { ease: EASE.out } });
     tl.from('[data-moon]', {
       autoAlpha: 0,
@@ -25,14 +27,14 @@ export function Invitation({ opened, onOpen }: { opened: boolean; onOpen: () => 
       .from(
         '[data-greeting] [data-word]',
         { yPercent: 110, duration: DUR.slow, stagger: STAGGER.words, ease: EASE.settle },
-        '-=1.4',
+        0.25,
       )
       .from(
         '[data-line] [data-word]',
         { yPercent: 110, duration: DUR.slow, stagger: STAGGER.words / 2, ease: EASE.settle },
-        '-=0.9',
+        0.55,
       )
-      .from('[data-cta]', { autoAlpha: 0, y: 12, duration: DUR.base }, '-=0.5');
+      .from('[data-cta]', { autoAlpha: 0, y: 12, duration: DUR.slow }, 0.85);
     // the moon breathes, very slowly
     gsap.to('[data-moon]', {
       y: -8,
