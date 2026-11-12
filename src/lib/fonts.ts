@@ -11,12 +11,17 @@ const ETHIOPIC = 'U+1200-139F, U+2D80-2DDF, U+AB00-AB2F';
  */
 export async function loadPrivateFonts(fonts: PrivateFonts | undefined, timeoutMs = 4000) {
   if (!fonts || typeof FontFace === 'undefined' || !document.fonts) return;
+  const existing = (family: string) =>
+    [...document.fonts].filter((f) => f.family.replace(/["']/g, '') === family);
   const wanted: [string, string | undefined][] = [
     ['Moon Heading', fonts.heading],
     ['Moon Body', fonts.body],
   ];
-  const faces = wanted.flatMap(([family, file]) => {
+  const faces = wanted.flatMap(([family, file]): Promise<unknown>[] => {
     if (!file) return [];
+    // /boot.js may already have started this face as soon as the content arrived
+    const started = existing(family);
+    if (started.length) return started.map((f) => f.loaded.catch(() => undefined));
     const face = new FontFace(family, `url(${mediaUrl(file)}) format("woff2")`, {
       display: 'swap',
       unicodeRange: ETHIOPIC,
