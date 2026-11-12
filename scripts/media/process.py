@@ -8,7 +8,10 @@ modifies originals, and writes browser-friendly derivatives:
   stills -> WebP frames grabbed from a video at a timestamp
 
 Usage:
-  python scripts/media/process.py <source_dir> <selection.json> <out_dir>
+  python scripts/media/process.py <source_dir> <selection.json> <out_dir> [id,id]
+
+Optional per-video keys: "cut": [a, b] removes seconds a..b; "blur": [x, y, w, h]
+(fractions of the frame) softens a fixed on-screen overlay such as a sticker.
 """
 
 from __future__ import annotations
@@ -66,7 +69,17 @@ def webp_variants(img: Image.Image, out_dir: Path, asset_id: str) -> list[dict]:
 def process_video(src: Path, out_dir: Path, item: dict) -> dict:
     asset_id = item["id"]
     out = out_dir / f"{asset_id}.mp4"
-    vf = f"scale='min({VIDEO_MAX_W},iw)':-2:flags=lanczos,format=yuv420p"
+    filters = []
+    if "cut" in item:  # drop [start, end] seconds from the middle of the clip
+        a, b = item["cut"]
+        filters.append(f"select='not(between(t,{a},{b}))',setpts=N/FRAME_RATE/TB")
+    if "blur" in item:  # soften a fixed on-screen overlay; [x, y, w, h] as fractions
+        x, y, w, h = item["blur"]
+        filters.append(
+            f"split[m][o];[o]crop=iw*{w}:ih*{h}:iw*{x}:ih*{y},gblur=sigma=16[b];"
+            f"[m][b]overlay=main_w*{x}:main_h*{y}")
+    filters.append(f"scale='min({VIDEO_MAX_W},iw)':-2:flags=lanczos,format=yuv420p")
+    vf = ",".join(filters)
     cmd = ["ffmpeg", "-v", "error", "-y"]
     if "start" in item:
         cmd += ["-ss", str(item["start"])]
@@ -112,8 +125,14 @@ def process_image(src: Path, out_dir: Path, item: dict) -> dict:
 
 def main() -> None:
     source_dir, selection_path, out_dir = map(Path, sys.argv[1:4])
+    only = set(sys.argv[4].split(",")) if len(sys.argv) > 4 else None
     out_dir.mkdir(parents=True, exist_ok=True)
     selection = json.loads(selection_path.read_text(encoding="utf-8"))
+    manifest_path = out_dir / "manifest.json"
+    previous = ({m["id"]: m for m in json.loads(manifest_path.read_text())}
+                if only and manifest_path.exists() else {})
+    if only:
+        selection = [i for i in selection if i["id"] in only]
     manifest = []
     for item in selection:
         src = source_dir / item["source"]
@@ -138,7 +157,10 @@ def main() -> None:
             },
         })
         print(f"ok  {item['id']:<16} <- {item['source']}", flush=True)
-    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2))
+    if previous:  # partial run: replace only the re-processed entries
+        done = {m["id"]: m for m in manifest}
+        manifest = [done.pop(k, v) for k, v in previous.items()] + list(done.values())
+    manifest_path.write_text(json.dumps(manifest, indent=2))
 
 
 if __name__ == "__main__":
