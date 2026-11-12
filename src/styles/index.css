@@ -1,16 +1,16 @@
 @import 'tailwindcss';
 
 /* Fonts are self-hosted via Fontsource (no third-party requests). */
+/* Latin accents (the date, English descriptions) */
 @import '@fontsource/cormorant-garamond/latin-300.css';
 @import '@fontsource/cormorant-garamond/latin-400.css';
 @import '@fontsource/cormorant-garamond/latin-400-italic.css';
-@import '@fontsource/cormorant-garamond/latin-500-italic.css';
 @import '@fontsource-variable/manrope/wght.css';
-/* Ethiopic: loaded only when Ethiopic text is on screen (unicode-range). */
-@import '@fontsource/noto-serif-ethiopic/ethiopic-300.css';
-@import '@fontsource/noto-serif-ethiopic/ethiopic-400.css';
+/* Ethiopic (SIL OFL): bold for headings, regular for body. Loaded only when
+   Ethiopic text is on screen (unicode-range). */
 @import '@fontsource/noto-sans-ethiopic/ethiopic-400.css';
 @import '@fontsource/noto-sans-ethiopic/ethiopic-600.css';
+@import '@fontsource/noto-sans-ethiopic/ethiopic-700.css';
 
 @theme {
   --color-night: #0b0f1f;
@@ -25,10 +25,10 @@
   --color-paper: #f4ecdc;
   --color-ink: #2a2440;
 
-  --font-serif: 'Cormorant Garamond', 'Noto Serif Ethiopic', Georgia, serif;
+  --font-serif: 'Cormorant Garamond', 'Noto Sans Ethiopic', Georgia, serif;
   --font-sans:
     'Manrope Variable', 'Noto Sans Ethiopic', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-ethiopic: 'Noto Serif Ethiopic', 'Cormorant Garamond', serif;
+  --font-ethiopic: 'Noto Sans Ethiopic', 'Manrope Variable', sans-serif;
 }
 
 @layer base {
@@ -203,21 +203,19 @@
     font-synthesis: none;
     overflow-wrap: break-word;
   }
+  /* Amharic headings: bold sans; Latin inside them keeps the serif */
   :lang(am) .display {
-    line-height: 1.24;
-    letter-spacing: 0;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
   }
-  :lang(am) .kicker {
-    font-size: 0.78rem;
-    letter-spacing: 0.14em;
+  .date-display {
+    font-weight: 300;
+    letter-spacing: -0.02em;
   }
   :lang(am) .prose-serif {
-    font-size: clamp(1.12rem, 4.3vw, 1.45rem);
-    line-height: 1.75;
-  }
-  :lang(am) .btn {
-    font-size: 0.95rem;
-    letter-spacing: 0.04em;
+    font-size: clamp(1.06rem, 4.1vw, 1.32rem);
+    line-height: 1.85;
   }
   :lang(am) .ethiopic {
     line-height: 1.85;

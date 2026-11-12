@@ -75,7 +75,7 @@ export function Notes() {
                   aria-hidden={!isOpen}
                   className="absolute inset-0 flex items-center justify-center rounded-sm bg-paper p-4 text-center sm:p-6 text-ink [backface-visibility:hidden] [transform:rotateY(180deg)]"
                 >
-                  <span className="display text-[clamp(1.2rem,5.2vw,1.7rem)] italic leading-tight">
+                  <span className="display text-[clamp(1.05rem,4.6vw,1.5rem)] font-semibold leading-snug">
                     {note.text}
                   </span>
                 </span>

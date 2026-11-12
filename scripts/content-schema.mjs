@@ -54,8 +54,8 @@ export function validateContent(c) {
   });
   if (c.music && !/^[a-z0-9]+(?:-[a-z0-9]+)*\.m4a$/.test(c.music.file ?? ''))
     errs.push('music.file must be a safe .m4a file name');
-  if (c.ui?.chapters && (!Array.isArray(c.ui.chapters) || c.ui.chapters.length !== 9))
-    errs.push('ui.chapters must list all 9 chapter labels');
+  if (c.ui?.chapters && (!Array.isArray(c.ui.chapters) || c.ui.chapters.length !== 10))
+    errs.push('ui.chapters must list all 10 navigation labels');
   ref(c.finale?.photo, 'finale.photo');
   str(c.finale?.title, 'finale.title');
   str(c.finale?.signature, 'finale.signature');

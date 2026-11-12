@@ -17,7 +17,7 @@ import type { SiteContent } from './content/types';
 import { resolveUi } from './content/ui';
 import { PUBLIC_TEXT as T } from './i18n/public';
 import { loadContent } from './lib/api';
-import { ScrollTrigger } from './lib/motion';
+import { ScrollTrigger, gsap, prefersReducedMotion } from './lib/motion';
 import { sound } from './lib/sound';
 
 type Status = 'checking' | 'locked' | 'loading' | 'ready' | 'error';
@@ -66,7 +66,7 @@ export default function App() {
       ) : status === 'locked' ? (
         <Unlock onUnlocked={load} />
       ) : status === 'error' || !content ? (
-        <div className="grid min-h-[100dvh] place-items-center px-6 text-center" lang={T.lang}>
+        <div className="grid min-h-[100dvh] place-items-center px-6 text-center">
           <div>
             <p className="display text-3xl">{T.error}</p>
             <button type="button" className="btn mt-8" onClick={load}>
@@ -112,6 +112,23 @@ function Experience() {
     }, 120);
     return () => window.clearTimeout(id);
   }, [pendingScroll]);
+
+  // Chapter labels settle from wide tracking as each chapter arrives. Only
+  // letter-spacing is animated, so it never fights the chapters' own reveals.
+  useEffect(() => {
+    if (!opened || prefersReducedMotion()) return;
+    const ctx = gsap.context(() => {
+      gsap.utils.toArray<HTMLElement>('main .kicker').forEach((el) => {
+        gsap.from(el, {
+          letterSpacing: '0.75em',
+          duration: 1.6,
+          ease: 'expo.out',
+          scrollTrigger: { trigger: el, start: 'top 90%', once: true },
+        });
+      });
+    });
+    return () => ctx.revert();
+  }, [opened, run]);
 
   const open = () => {
     sound.start();

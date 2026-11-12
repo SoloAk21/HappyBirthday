@@ -23,6 +23,14 @@ export function Gift() {
     const el = box.current!;
     const tl = gsap.timeline({ onComplete: () => setState('open') });
     tl.to(el, { rotate: -4, duration: 0.09, yoyo: true, repeat: 3, ease: 'sine.inOut' })
+      // the ribbon comes loose first
+      .to(el.querySelectorAll('[data-ribbon]'), {
+        scaleY: 0,
+        transformOrigin: '50% 0%',
+        duration: 0.45,
+        ease: EASE.inOut,
+        stagger: 0.08,
+      })
       .to(el.querySelector('[data-bow]'), {
         scale: 0,
         autoAlpha: 0,
@@ -57,14 +65,20 @@ export function Gift() {
           <div ref={box} className="relative h-48 w-48" aria-hidden="true">
             {/* box */}
             <div className="absolute inset-x-3 bottom-0 top-12 rounded-sm bg-[linear-gradient(150deg,#2a3263,#1b2244)] shadow-[0_30px_50px_-20px_rgb(0_0_0/0.7)]">
-              <div className="absolute inset-y-0 left-1/2 w-6 -translate-x-1/2 bg-champagne/90" />
+              <div
+                data-ribbon
+                className="absolute inset-y-0 left-1/2 w-6 -translate-x-1/2 bg-champagne/90"
+              />
             </div>
             {/* lid */}
             <div
               data-lid
               className="absolute inset-x-0 top-6 h-10 rounded-sm bg-[linear-gradient(150deg,#323b72,#222a52)] shadow-md"
             >
-              <div className="absolute inset-y-0 left-1/2 w-6 -translate-x-1/2 bg-champagne" />
+              <div
+                data-ribbon
+                className="absolute inset-y-0 left-1/2 w-6 -translate-x-1/2 bg-champagne"
+              />
             </div>
             {/* bow */}
             <div data-bow className="absolute left-1/2 top-0 h-10 w-24 -translate-x-1/2">

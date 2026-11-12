@@ -90,7 +90,7 @@ export function BirthdayReveal() {
       <p className="kicker text-center">{c.reveal.kicker ?? 'Chapter II'}</p>
       <h2
         data-date
-        className="display mt-6 whitespace-nowrap text-center text-[clamp(2.6rem,14.5vw,9rem)] text-champagne"
+        className="display date-display mt-6 whitespace-nowrap text-center text-[clamp(2.6rem,14.5vw,9rem)] text-champagne"
       >
         <Words text={c.reveal.date} />
       </h2>

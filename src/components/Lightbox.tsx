@@ -145,7 +145,7 @@ function Slide({ item, position }: { item: GalleryItem; position: string }) {
         )}
       </div>
       {item.caption && (
-        <figcaption className="display text-center text-2xl italic text-ivory/90">
+        <figcaption className="prose-serif text-center !text-xl italic text-ivory/90">
           {item.caption}
         </figcaption>
       )}

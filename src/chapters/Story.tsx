@@ -108,8 +108,8 @@ export function Story() {
               <p
                 className={
                   i === last
-                    ? 'display max-w-xl text-[clamp(2rem,8.4vw,3.6rem)] text-champagne [text-shadow:0_2px_24px_rgb(0_0_0/0.6)]'
-                    : 'display max-w-xl text-[clamp(1.8rem,7.6vw,3.2rem)] [text-shadow:0_2px_24px_rgb(0_0_0/0.6)]'
+                    ? 'display max-w-xl text-[clamp(1.9rem,8vw,3.4rem)] text-champagne [text-shadow:0_2px_24px_rgb(0_0_0/0.6)]'
+                    : 'display max-w-xl text-[clamp(1.6rem,6.8vw,2.8rem)] font-semibold [text-shadow:0_2px_24px_rgb(0_0_0/0.6)]'
                 }
               >
                 {l.text}

@@ -7,6 +7,7 @@ export const CHAPTERS = [
   { id: 'birthday' },
   { id: 'smile' },
   { id: 'moments' },
+  { id: 'memories' },
   { id: 'adore' },
   { id: 'letter' },
   { id: 'surprise' },

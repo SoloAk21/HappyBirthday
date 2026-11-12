@@ -9,6 +9,7 @@ export const DEFAULT_UI: Required<UiText> = {
     'Hey, My Moon',
     'A birthday worth celebrating',
     'The smile that changes everything',
+    'How it started',
     'Our little moments',
     'Little things I adore',
     'A letter for my Moon',

@@ -29,13 +29,20 @@ export function Letter() {
         duration: 0.3,
         ease: 'back.in(2)',
       })
-      .to(env.querySelector('[data-flap]'), { rotateX: 180, duration: DUR.base, ease: EASE.inOut })
+      // the flap turns back, catching less light as it goes
+      .to(env.querySelector('[data-flap]'), {
+        rotateX: 180,
+        filter: 'brightness(0.78)',
+        duration: DUR.base,
+        ease: EASE.inOut,
+      })
+      // the letter slides up and out of the envelope
       .to(
         env.querySelector('[data-peek]'),
-        { yPercent: -60, duration: DUR.base, ease: EASE.out },
-        '-=0.25',
+        { yPercent: -88, scale: 1.04, duration: DUR.slow, ease: EASE.settle },
+        '-=0.2',
       )
-      .to(env, { autoAlpha: 0, y: 30, duration: DUR.base, ease: EASE.inOut }, '+=0.15');
+      .to(env, { autoAlpha: 0, y: 36, duration: DUR.base, ease: EASE.inOut }, '-=0.35');
   }
 
   // While she reads, the music steps back a little.

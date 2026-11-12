@@ -234,6 +234,14 @@ class SoundEngine {
     if (on === this.ducked) return;
     this.ducked = on;
     this.rampTrack(1.4);
+    // the synthesized score steps back too
+    const { ctx, music } = this;
+    if (ctx && music) {
+      const t = ctx.currentTime;
+      music.gain.cancelScheduledValues(t);
+      music.gain.setValueAtTime(music.gain.value, t);
+      music.gain.linearRampToValueAtTime(on ? 0.2 : 0.55, t + 1.4);
+    }
   }
 
   private emit() {

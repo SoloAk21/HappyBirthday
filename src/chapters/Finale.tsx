@@ -50,6 +50,18 @@ export function Finale({ onReplay, onMoments }: { onReplay: () => void; onMoment
       stagger: STAGGER.words,
       scrollTrigger: { trigger: '[data-final-title]', start: 'top 85%', once: true },
     });
+    // a slow bloom of moonlight behind the closing words
+    gsap.fromTo(
+      '[data-moonlight]',
+      { autoAlpha: 0, scale: 0.6 },
+      {
+        autoAlpha: 1,
+        scale: 1,
+        duration: 4,
+        ease: EASE.soft,
+        scrollTrigger: { trigger: '[data-final-title]', start: 'top 85%', once: true },
+      },
+    );
     gsap.from('[data-sign], [data-actions]', {
       autoAlpha: 0,
       y: 14,
@@ -105,6 +117,15 @@ export function Finale({ onReplay, onMoments }: { onReplay: () => void; onMoment
         </p>
       ))}
 
+      <div
+        data-moonlight
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-[12%] left-1/2 -z-10 h-[70vmin] w-[70vmin] -translate-x-1/2 rounded-full"
+        style={{
+          background:
+            'radial-gradient(circle, rgb(246 240 228 / 0.10), rgb(185 179 220 / 0.05) 45%, transparent 70%)',
+        }}
+      />
       <h2
         ref={title}
         id="finale-title"

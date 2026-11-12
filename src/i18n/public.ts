@@ -4,17 +4,18 @@
  * file where the public-safety check allows Ethiopic script.
  */
 export const PUBLIC_TEXT = {
-  lang: 'am',
-  title: ['ትንሽ ዓለም፣', 'ላንቺ ብቻ።'],
-  subtitle: 'በሚስጥራዊ ቃላታችን ትከፈታለች።',
-  label: 'ሚስጥራዊ ቃላት',
-  placeholder: 'ሚስጥራዊ ቃላታችን',
-  open: 'ክፈቺ',
-  opening: 'እየተከፈተ ነው…',
-  wrong: 'ልክ አይደለም። ቃላቱን በቀስታ እንደገና ሞክሪ።',
-  rateLimited: 'ትንሽ እንረፍ። ከ{min} ደቂቃ በኋላ እንደገና ሞክሪ።',
-  unavailable: 'ዓለሟ ገና እየነቃች ነው። ትንሽ ቆይተሽ እንደገና ሞክሪ።',
-  loading: 'እየተከፈተ ነው',
-  error: 'ከዋክብቱ ትንሽ አፍረዋል።',
-  retry: 'እንደገና ሞክሪ',
+  /** The Amharic title line(s); the rest of the screen is English. */
+  titleLang: 'am',
+  title: ['ላንቺ ብቻ የተዘጋጀች', 'ትንሽ ዓለም።'],
+  subtitle: 'Unlock with our secret word',
+  label: 'Secret word',
+  placeholder: 'Enter secret word...',
+  open: 'Unlock',
+  opening: 'Unlocking…',
+  wrong: 'Oops, not quite right. Try our secret word again.',
+  rateLimited: "Let's take a short pause. Try again in {min} min.",
+  unavailable: 'The little world is still waking up. Please try again shortly.',
+  loading: 'Opening',
+  error: 'Something went quiet for a moment.',
+  retry: 'Try again',
 } as const;

@@ -46,14 +46,13 @@ export function Unlock({ onUnlocked }: { onUnlocked: () => void }) {
   return (
     <main
       ref={scope}
-      lang={T.lang}
       className="relative mx-auto flex min-h-[100dvh] max-w-md flex-col items-center justify-center px-6 text-center"
       style={{ paddingBottom: 'calc(var(--safe-bottom) + 2rem)' }}
     >
       <div data-moon className="mb-10 w-40 sm:w-48">
         <Moon />
       </div>
-      <h1 data-reveal className="display text-4xl sm:text-5xl">
+      <h1 data-reveal lang={T.titleLang} className="display text-[clamp(2rem,9vw,3rem)]">
         {T.title[0]}
         <br />
         <span className="text-champagne">{T.title[1]}</span>
