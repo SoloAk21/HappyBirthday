@@ -9,7 +9,7 @@ const ETHIOPIC = 'U+1200-139F, U+2D80-2DDF, U+AB00-AB2F';
  * route) and resolves when they are ready — or after `timeoutMs`, so a slow
  * network never holds the experience back. Latin text keeps the public fonts.
  */
-export async function loadPrivateFonts(fonts: PrivateFonts | undefined, timeoutMs = 2000) {
+export async function loadPrivateFonts(fonts: PrivateFonts | undefined, timeoutMs = 4000) {
   if (!fonts || typeof FontFace === 'undefined' || !document.fonts) return;
   const wanted: [string, string | undefined][] = [
     ['Moon Heading', fonts.heading],
