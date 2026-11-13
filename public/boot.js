@@ -8,8 +8,10 @@
   function startFonts(fonts) {
     if (!fonts || typeof FontFace === 'undefined' || !document.fonts) return;
     var list = [
-      ['Moon Heading', fonts.heading],
-      ['Moon Body', fonts.body],
+      ['Moon Heading', fonts.heading, ETHIOPIC],
+      // the birthday date also sets its digits in the heading face (same file)
+      ['Moon Date', fonts.heading, ETHIOPIC + ', U+0030-0039'],
+      ['Moon Body', fonts.body, ETHIOPIC],
     ];
     window.__moonFonts = Promise.all(
       list
@@ -19,7 +21,7 @@
         .map(function (f) {
           var face = new FontFace(f[0], 'url(/api/media/' + f[1] + ') format("woff2")', {
             display: 'swap',
-            unicodeRange: ETHIOPIC,
+            unicodeRange: f[2],
             weight: '100 900',
           });
           document.fonts.add(face);
